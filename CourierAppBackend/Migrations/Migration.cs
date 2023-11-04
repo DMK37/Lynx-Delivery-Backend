@@ -1,5 +1,5 @@
 namespace CourierAppBackend.Migrations;
-// git accept empty folders
+// git dont accept empty folders
 public class Migration
 {
     
