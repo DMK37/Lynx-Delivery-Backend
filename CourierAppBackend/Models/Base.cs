@@ -1,6 +1,7 @@
+
 namespace CourierAppBackend.Models;
-// git dont accept empty folders
-public class Base
+
+public abstract class Base
 {
-    
+    public int ID { get; set; }
 }
