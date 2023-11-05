@@ -1,3 +1,4 @@
+using CourierAppBackend.Abstractions;
 using CourierAppBackend.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IInquiriesRepository, DbInquiriesRepository>();
+
 
 // online db cs "Server=courierdb.postgres.database.azure.com;Database=courierdb;Port=5432;User Id=courier;Password=fucxo8-moxwev-suQduw;Ssl Mode=VerifyFull;"
 // local cs "Host=localhost;Database=testDb;Username=postgres;Password=password123"
