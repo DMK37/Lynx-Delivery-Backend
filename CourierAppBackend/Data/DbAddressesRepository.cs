@@ -23,8 +23,9 @@ public class DbAddressesRepository : IAddressesRepository
         {
             _context.Addresses.Add(address);
             _context.SaveChanges();
+            resultAddress = address;
         }
 
-        return resultAddress!;
+        return resultAddress;
     }
 }
