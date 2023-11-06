@@ -12,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IInquiriesRepository, DbInquiriesRepository>();
+builder.Services.AddScoped<IAddressesRepository, DbAddressesRepository>();
 
 
 // online db cs "Server=courierdb.postgres.database.azure.com;Database=courierdb;Port=5432;User Id=courier;Password=fucxo8-moxwev-suQduw;Ssl Mode=VerifyFull;"
