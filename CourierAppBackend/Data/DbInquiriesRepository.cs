@@ -23,4 +23,17 @@ public class DbInquiriesRepository : IInquiriesRepository
             .ToList();
         return inquiries;
     }
+
+    public List<Inquiry> GetAll()
+    {
+        return _context.Inquiries
+            .Include(x => x.SourceAddress)
+            .Include(x => x.DestinationAddress)
+            .ToList();
+    }
+    public Inquiry GetInquiryById(int id)
+    {
+        var result = _context.Inquiries.Find(id);
+        return result!;
+    }
 }
