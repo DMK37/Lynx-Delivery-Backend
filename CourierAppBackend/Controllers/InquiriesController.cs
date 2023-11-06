@@ -1,4 +1,5 @@
 ﻿using CourierAppBackend.Abstractions;
+using CourierAppBackend.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourierAppBackend.Controllers;
@@ -15,7 +16,7 @@ public class InquiriesController : ControllerBase
     }
 
     // GET: api/inquiries/{id}
-    [HttpGet("{id}")]
+    [HttpGet("{id}", Name ="Get")]
     public IActionResult GetInquiryById(int id)
     {
         var inquiry = _inquiriesRepository.GetInquiryById(id);
@@ -32,6 +33,16 @@ public class InquiriesController : ControllerBase
         if (inquiries is null || inquiries.Count == 0)
             return NotFound();
         return Ok(inquiries);
+    }
+
+    // POST: api/inquiries
+    [HttpPost]
+    public IActionResult CreateInquiry(Inquiry inquiry)
+    {
+        var createdInquiry = _inquiriesRepository.CreateInquiry(inquiry);
+        if (createdInquiry is null)
+            return BadRequest();
+        return CreatedAtRoute("Get", new { ID = inquiry.ID }, inquiry);
     }
 
 }
