@@ -7,9 +7,11 @@ namespace CourierAppBackend.Data;
 public class DbInquiriesRepository : IInquiriesRepository
 {
     private readonly CourierAppContext _context;
-    public DbInquiriesRepository(CourierAppContext context)
+    private readonly IAddressesRepository _addressesRepository;
+    public DbInquiriesRepository(CourierAppContext context, IAddressesRepository addressesRepository)
     {
         _context = context;
+        _addressesRepository = addressesRepository;
     }
 
     public List<Inquiry> GetLastInquiries(int userId)
@@ -39,35 +41,15 @@ public class DbInquiriesRepository : IInquiriesRepository
         return result!;
     }
 
-    // just to work, it will have to be fixed so it looks better 
     public Inquiry CreateInquiry(Inquiry inquiry)
     {
         if (inquiry is null)
             return inquiry!;
-        var source = _context.Addresses.FirstOrDefault(x => x.City == inquiry.SourceAddress.City &&
-                                        x.PostalCode == inquiry.SourceAddress.PostalCode &&
-                                        x.Street == inquiry.SourceAddress.Street &&
-                                        x.HouseNumber == inquiry.SourceAddress.HouseNumber &&
-                                        x.ApartmentNumber == inquiry.SourceAddress.HouseNumber);
-        if (source is not null)
-            inquiry.SourceAddress = source;
-        else
-        {
-            _context.Addresses.Add(inquiry.SourceAddress);
-            _context.SaveChanges();
-        }
-        var destination = _context.Addresses.FirstOrDefault(x => x.City == inquiry.DestinationAddress.City &&
-                                        x.PostalCode == inquiry.DestinationAddress.PostalCode &&
-                                        x.Street == inquiry.DestinationAddress.Street &&
-                                        x.HouseNumber == inquiry.DestinationAddress.HouseNumber &&
-                                        x.ApartmentNumber == inquiry.DestinationAddress.ApartmentNumber);
-        if (destination is not null)
-            inquiry.DestinationAddress = destination;
-        else
-        {
-            _context.Addresses.Add(inquiry.DestinationAddress);
-            _context.SaveChanges();
-        }
+
+        inquiry.DateOfInquiring = DateTime.UtcNow;
+        inquiry.SourceAddress = _addressesRepository.FindOrAddAddress(inquiry.SourceAddress);
+        inquiry.DestinationAddress = _addressesRepository.FindOrAddAddress(inquiry.DestinationAddress);
+
         _context.Add(inquiry);
         _context.SaveChanges();
         return inquiry;
