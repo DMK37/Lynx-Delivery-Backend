@@ -19,7 +19,7 @@ builder.Services.AddScoped<IAddressesRepository, DbAddressesRepository>();
 // local cs "Host=localhost;Database=testDb;Username=postgres;Password=password123"
 // later connection string won't be hardcoded
 builder.Services.AddDbContext<CourierAppContext>(
-    options => options.UseNpgsql("Server=courierdb.postgres.database.azure.com;Database=courierdb;Port=5432;User Id=courier;Password=fucxo8-moxwev-suQduw;Ssl Mode=VerifyFull;"));
+    options => options.UseNpgsql(builder.Configuration.GetConnectionString("MainDatabase")));
 
 var app = builder.Build();
 
