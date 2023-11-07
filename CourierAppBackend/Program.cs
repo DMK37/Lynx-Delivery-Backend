@@ -13,11 +13,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IInquiriesRepository, DbInquiriesRepository>();
 builder.Services.AddScoped<IAddressesRepository, DbAddressesRepository>();
+builder.Services.AddScoped<IUserRepository, DbUserRepository>();
+builder.Services.AddScoped<IOffersRepository, DbOffersRepository>();
 
-
-// online db cs "Server=courierdb.postgres.database.azure.com;Database=courierdb;Port=5432;User Id=courier;Password=fucxo8-moxwev-suQduw;Ssl Mode=VerifyFull;"
-// local cs "Host=localhost;Database=testDb;Username=postgres;Password=password123"
-// later connection string won't be hardcoded
 builder.Services.AddDbContext<CourierAppContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("MainDatabase")));
 

@@ -1,7 +1,8 @@
+using CourierAppBackend.Abstractions;
 using CourierAppBackend.Models;
 
 namespace CourierAppBackend.Data;
-public class DbUserRepository
+public class DbUserRepository : IUserRepository
 {
     private readonly CourierAppContext context;
 

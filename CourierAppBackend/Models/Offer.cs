@@ -12,7 +12,7 @@ public enum OfferStatus
 
 public class Offer : Base
 {
-    public Inquiry Inquiry { get; set; } = null!;
+    public int InquiryID { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime UpdateDate { get; set; }
     public DateTime PickupDate { get; set; }
@@ -21,6 +21,7 @@ public class Offer : Base
     public Address SourceAddress { get; set; } = null!;
     public Address DestinationAddress { get; set; } = null!;
     public bool DeliveryAtWeekend { get; set; }
+    public bool HighPriority { get; set; }
     public OfferStatus Status { get; set; }
     public Price Price { get; set; } = null!;
 }

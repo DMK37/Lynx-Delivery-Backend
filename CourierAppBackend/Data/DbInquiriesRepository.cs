@@ -17,7 +17,7 @@ public class DbInquiriesRepository : IInquiriesRepository
     public List<Inquiry> GetLastInquiries(int userId)
     {
         var inquiries = (from i in _context.Inquiries
-                         where i.User.ID == userId && (DateTime.UtcNow - i.DateOfInquiring).Days < 30
+                         where i.ID == userId && (DateTime.UtcNow - i.DateOfInquiring).Days < 30
                          select i)
             .Include(i => i.SourceAddress)
             .Include(i => i.DestinationAddress)
