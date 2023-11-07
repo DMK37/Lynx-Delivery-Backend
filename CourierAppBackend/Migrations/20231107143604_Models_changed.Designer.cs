@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CourierAppBackend.Migrations
 {
     [DbContext(typeof(CourierAppContext))]
-    [Migration("20231107142439_ModelsChanged")]
-    partial class ModelsChanged
+    [Migration("20231107143604_Models_changed")]
+    partial class Models_changed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
