@@ -1,5 +1,6 @@
 ﻿using CourierAppBackend.Abstractions;
 using CourierAppBackend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourierAppBackend.Controllers;
@@ -27,6 +28,7 @@ public class InquiriesController : ControllerBase
 
     // GET: api/inquiries
     [HttpGet]
+    [Authorize("read:inquiries")]
     public IActionResult GetAll()
     {
         var inquiries = _inquiriesRepository.GetAll();

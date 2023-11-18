@@ -2,6 +2,7 @@
 using CourierAppBackend.Data;
 using CourierAppBackend.DtoModels;
 using CourierAppBackend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,7 @@ namespace CourierAppBackend.Controllers
 
         // POST: api/offers
         [HttpPost]
-        public ActionResult<Offer> CreateInquiry(CreateOffer createOffer)
+        public ActionResult<Offer> CreateOffer([FromBody] CreateOffer createOffer)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
