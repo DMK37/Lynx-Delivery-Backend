@@ -27,7 +27,7 @@ namespace CourierAppBackend.Controllers
             var offer = _offersRepository.CreateNewOffer(createOffer);
             if(offer is null)
                 return BadRequest();
-            return CreatedAtRoute("Get", new { ID = offer.ID }, offer);
+            return CreatedAtRoute("Get", new { ID = offer.Id }, offer);
         }
         // GET: api/offers/{id}
         [HttpGet]

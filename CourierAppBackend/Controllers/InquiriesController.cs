@@ -44,7 +44,7 @@ public class InquiriesController : ControllerBase
         var createdInquiry = _inquiriesRepository.CreateInquiry(inquiry);
         if (createdInquiry is null)
             return BadRequest();
-        return CreatedAtRoute("Get", new { ID = inquiry.ID }, inquiry);
+        return CreatedAtRoute("Get", new { ID = inquiry.Id }, inquiry);
     }
 
 }

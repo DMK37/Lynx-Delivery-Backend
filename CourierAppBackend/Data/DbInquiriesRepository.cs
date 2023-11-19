@@ -14,10 +14,10 @@ public class DbInquiriesRepository : IInquiriesRepository
         _addressesRepository = addressesRepository;
     }
 
-    public List<Inquiry> GetLastInquiries(int userId)
+    public List<Inquiry> GetLastInquiries(string userId)
     {
         var inquiries = (from i in _context.Inquiries
-                         where i.ID == userId && (DateTime.UtcNow - i.DateOfInquiring).Days < 30
+                         where i.UserId == userId && (DateTime.UtcNow - i.DateOfInquiring).Days < 30
                          select i)
             .Include(i => i.SourceAddress)
             .Include(i => i.DestinationAddress)
@@ -37,7 +37,7 @@ public class DbInquiriesRepository : IInquiriesRepository
         var result = _context.Inquiries
             .Include(x => x.SourceAddress)
             .Include(x => x.DestinationAddress)
-            .FirstOrDefault(x => x.ID == id);
+            .FirstOrDefault(x => x.Id == id);
         return result!;
     }
 

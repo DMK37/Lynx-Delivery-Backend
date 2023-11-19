@@ -8,16 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//     .AddJwtBearer(options =>
-//     {
-//         options.Authority = domain;
-//         options.Audience = builder.Configuration["Auth0:Audience"];
-//         options.TokenValidationParameters = new TokenValidationParameters
-//         {
-//             NameClaimType = ClaimTypes.NameIdentifier
-//         };
-//     });
+
 var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
 {
@@ -50,6 +41,8 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("read:inquiries",
         policy => { policy.Requirements.Add(new RbacRequirement("read:inquiries")); });
+    options.AddPolicy("edit:profile",
+        policy => { policy.Requirements.Add(new RbacRequirement("edit:profile")); });
 });
 builder.Services.AddSingleton<IAuthorizationHandler, RbacHandler>();
 
@@ -62,7 +55,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IInquiriesRepository, DbInquiriesRepository>();
 builder.Services.AddScoped<IAddressesRepository, DbAddressesRepository>();
-builder.Services.AddScoped<IUserRepository, DbUserRepository>();
+builder.Services.AddScoped<IUserInfoRepository, DbUserInfoRepository>();
 builder.Services.AddScoped<IOffersRepository, DbOffersRepository>();
 
 builder.Services.AddDbContext<CourierAppContext>(

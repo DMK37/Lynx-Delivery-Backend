@@ -71,7 +71,7 @@ namespace CourierAppBackend.Data
             var result = _context.Offers
             .Include(x => x.SourceAddress)
             .Include(x => x.DestinationAddress)
-            .FirstOrDefault(x => x.ID == ID);
+            .FirstOrDefault(x => x.Id == ID);
             return result!;
         }
     }
