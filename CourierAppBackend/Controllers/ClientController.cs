@@ -1,6 +1,7 @@
 using CourierAppBackend.Abstractions;
 using CourierAppBackend.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace CourierAppBackend.Controllers;
 
@@ -19,9 +20,15 @@ public class ClientController: ControllerBase
     }
 
     [HttpPut("{id}")] 
-    public ActionResult<UserInfo> CreateUserInfo([FromBody] UserInfo userInfo, string id)
+    public ActionResult<UserInfo> CreateUserInfo([FromBody] UserInfo userInfo)
     {
-            var userInf = _usersInfosRepo.Add(userInfo);
+        var tokenString = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        var handler = new JwtSecurityTokenHandler();
+        var jsonToken = handler.ReadToken(tokenString) as JwtSecurityToken;
+        var userId = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "sub")?.Value;
+        userInfo.UserId = userId!;
+
+        var userInf = _usersInfosRepo.Add(userInfo);
             if(userInf is null)
                 return BadRequest();
             return CreatedAtRoute("Get", new { ID = userInfo.UserId }, userInfo);
