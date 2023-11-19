@@ -1,11 +1,12 @@
 using CourierAppBackend.Abstractions;
 using CourierAppBackend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourierAppBackend.Controllers;
 
 [ApiController]
-[Route("api/user-info")]
+[Route("api/client")]
 public class ClientController: ControllerBase
 {
     private readonly IInquiriesRepository _inquiriesRepository;
@@ -18,10 +19,11 @@ public class ClientController: ControllerBase
         _usersInfosRepo = usersInfosRepo;
     }
 
-    [HttpPut("{id}")] 
-    public ActionResult<UserInfo> CreateUserInfo([FromBody] UserInfo userInfo, string id)
+    [HttpPost("user-info")] 
+    [Authorize("edit:profile")]
+    public ActionResult<UserInfo> CreateUserInfo([FromBody] UserInfo userInfo)
     {
-            var userInf = _usersInfosRepo.Add(userInfo);
+            var userInf = _usersInfosRepo.CreateUserInfo(userInfo);
             if(userInf is null)
                 return BadRequest();
             return CreatedAtRoute("Get", new { ID = userInfo.UserId }, userInfo);
@@ -38,10 +40,10 @@ public class ClientController: ControllerBase
         return Ok(inquiries);
     }
     
-    [HttpGet("{id}")]
-    public ActionResult<Offer> GetOffer(string id)
+    [HttpGet("user-info/{userId}")]
+    public ActionResult<Offer> GetUserInfo( string userId)
     {
-        var offer = _usersInfosRepo.GetUserInfoById(id);
+        var offer = _usersInfosRepo.GetUserInfoById(userId);
         if (offer is null)
             return NotFound("User Not Found");
         return Ok(offer);

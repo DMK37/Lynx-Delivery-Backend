@@ -20,7 +20,7 @@ public class DbUserInfoRepository : IUserInfoRepository
         return _context.UsersInfos.Find(id);
     }
 
-    public UserInfo Add(UserInfo userInfo)
+    public UserInfo CreateUserInfo(UserInfo userInfo)
     {
         userInfo.Address = _addressesRepository.FindOrAddAddress(userInfo.Address);
         userInfo.DefaultSourceAddress = _addressesRepository.FindOrAddAddress(userInfo.DefaultSourceAddress);

@@ -18,7 +18,7 @@ public class DbAddressesRepository : IAddressesRepository
                                         x.PostalCode == address.PostalCode &&
                                         x.Street == address.Street &&
                                         x.HouseNumber == address.HouseNumber &&
-                                        x.ApartmentNumber == address.HouseNumber);
+                                        x.ApartmentNumber == address.ApartmentNumber);
         if (resultAddress is null)
         {
             _context.Addresses.Add(address);
