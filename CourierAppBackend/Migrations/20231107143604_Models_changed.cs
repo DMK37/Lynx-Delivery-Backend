@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CourierAppBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Models_changed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,6 +27,48 @@ namespace CourierAppBackend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Addresses", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Offers",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    InquiryID = table.Column<int>(type: "integer", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    PickupDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeliveryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Package_Height = table.Column<int>(type: "integer", nullable: false),
+                    Package_Width = table.Column<int>(type: "integer", nullable: false),
+                    Package_Length = table.Column<int>(type: "integer", nullable: false),
+                    Package_Weight = table.Column<float>(type: "real", nullable: false),
+                    SourceAddressID = table.Column<int>(type: "integer", nullable: false),
+                    DestinationAddressID = table.Column<int>(type: "integer", nullable: false),
+                    DeliveryAtWeekend = table.Column<bool>(type: "boolean", nullable: false),
+                    HighPriority = table.Column<bool>(type: "boolean", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Price_FullPrice = table.Column<float>(type: "real", nullable: false),
+                    Price_Taxes = table.Column<float>(type: "real", nullable: false),
+                    Price_Fees = table.Column<float>(type: "real", nullable: false),
+                    Price_Value = table.Column<float>(type: "real", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Offers", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Offers_Addresses_DestinationAddressID",
+                        column: x => x.DestinationAddressID,
+                        principalTable: "Addresses",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Offers_Addresses_SourceAddressID",
+                        column: x => x.SourceAddressID,
+                        principalTable: "Addresses",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -77,6 +119,7 @@ namespace CourierAppBackend.Migrations
                     SourceAddressID = table.Column<int>(type: "integer", nullable: false),
                     DestinationAddressID = table.Column<int>(type: "integer", nullable: false),
                     IsCompany = table.Column<bool>(type: "boolean", nullable: false),
+                    HighPriority = table.Column<bool>(type: "boolean", nullable: false),
                     DeliveryAtWeekend = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -101,53 +144,6 @@ namespace CourierAppBackend.Migrations
                         principalColumn: "ID");
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Offers",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    InquiryID = table.Column<int>(type: "integer", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    PickupDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DeliveryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Package_Height = table.Column<int>(type: "integer", nullable: false),
-                    Package_Width = table.Column<int>(type: "integer", nullable: false),
-                    Package_Length = table.Column<int>(type: "integer", nullable: false),
-                    Package_Weight = table.Column<float>(type: "real", nullable: false),
-                    SourceAddressID = table.Column<int>(type: "integer", nullable: false),
-                    DestinationAddressID = table.Column<int>(type: "integer", nullable: false),
-                    DeliveryAtWeekend = table.Column<bool>(type: "boolean", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
-                    Price_FullPrice = table.Column<float>(type: "real", nullable: false),
-                    Price_Taxes = table.Column<float>(type: "real", nullable: false),
-                    Price_Fees = table.Column<float>(type: "real", nullable: false),
-                    Price_Value = table.Column<float>(type: "real", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Offers", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Offers_Addresses_DestinationAddressID",
-                        column: x => x.DestinationAddressID,
-                        principalTable: "Addresses",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Offers_Addresses_SourceAddressID",
-                        column: x => x.SourceAddressID,
-                        principalTable: "Addresses",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Offers_Inquiries_InquiryID",
-                        column: x => x.InquiryID,
-                        principalTable: "Inquiries",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Inquiries_DestinationAddressID",
                 table: "Inquiries",
@@ -169,11 +165,6 @@ namespace CourierAppBackend.Migrations
                 column: "DestinationAddressID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Offers_InquiryID",
-                table: "Offers",
-                column: "InquiryID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Offers_SourceAddressID",
                 table: "Offers",
                 column: "SourceAddressID");
@@ -193,10 +184,10 @@ namespace CourierAppBackend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Offers");
+                name: "Inquiries");
 
             migrationBuilder.DropTable(
-                name: "Inquiries");
+                name: "Offers");
 
             migrationBuilder.DropTable(
                 name: "Users");

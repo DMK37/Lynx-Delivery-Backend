@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CourierAppBackend.Migrations
 {
     [DbContext(typeof(CourierAppContext))]
-    [Migration("20231105180120_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20231107143604_Models_changed")]
+    partial class Models_changed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -78,6 +78,9 @@ namespace CourierAppBackend.Migrations
                     b.Property<int>("DestinationAddressID")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("HighPriority")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsCompany")
                         .HasColumnType("boolean");
 
@@ -121,6 +124,9 @@ namespace CourierAppBackend.Migrations
                     b.Property<int>("DestinationAddressID")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("HighPriority")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("InquiryID")
                         .HasColumnType("integer");
 
@@ -139,8 +145,6 @@ namespace CourierAppBackend.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("DestinationAddressID");
-
-                    b.HasIndex("InquiryID");
 
                     b.HasIndex("SourceAddressID");
 
@@ -203,7 +207,7 @@ namespace CourierAppBackend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CourierAppBackend.Models.User", "User")
+                    b.HasOne("CourierAppBackend.Models.User", null)
                         .WithMany("Inquiries")
                         .HasForeignKey("UserID");
 
@@ -238,8 +242,6 @@ namespace CourierAppBackend.Migrations
                         .IsRequired();
 
                     b.Navigation("SourceAddress");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CourierAppBackend.Models.Offer", b =>
@@ -247,12 +249,6 @@ namespace CourierAppBackend.Migrations
                     b.HasOne("CourierAppBackend.Models.Address", "DestinationAddress")
                         .WithMany()
                         .HasForeignKey("DestinationAddressID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CourierAppBackend.Models.Inquiry", "Inquiry")
-                        .WithMany()
-                        .HasForeignKey("InquiryID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -313,8 +309,6 @@ namespace CourierAppBackend.Migrations
                         });
 
                     b.Navigation("DestinationAddress");
-
-                    b.Navigation("Inquiry");
 
                     b.Navigation("Package")
                         .IsRequired();

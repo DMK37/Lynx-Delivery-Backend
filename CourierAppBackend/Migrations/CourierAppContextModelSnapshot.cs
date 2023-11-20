@@ -24,11 +24,11 @@ namespace CourierAppBackend.Migrations
 
             modelBuilder.Entity("CourierAppBackend.Models.Address", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ApartmentNumber")
                         .IsRequired()
@@ -50,18 +50,21 @@ namespace CourierAppBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("CourierAppBackend.Models.Inquiry", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CourierCompanyName")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("DateOfInquiring")
                         .HasColumnType("timestamp with time zone");
@@ -72,39 +75,46 @@ namespace CourierAppBackend.Migrations
                     b.Property<DateTime>("DeliveryDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("DestinationAddressID")
+                    b.Property<int>("DestinationAddressId")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("HighPriority")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsCompany")
                         .HasColumnType("boolean");
 
+                    b.Property<int?>("OfferId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("PickupDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("SourceAddressID")
+                    b.Property<int>("SourceAddressId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("UserID")
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.HasKey("ID");
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
 
-                    b.HasIndex("DestinationAddressID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("SourceAddressID");
+                    b.HasIndex("DestinationAddressId");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("SourceAddressId");
 
                     b.ToTable("Inquiries");
                 });
 
             modelBuilder.Entity("CourierAppBackend.Models.Offer", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
@@ -115,8 +125,11 @@ namespace CourierAppBackend.Migrations
                     b.Property<DateTime>("DeliveryDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("DestinationAddressID")
+                    b.Property<int>("DestinationAddressId")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("HighPriority")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("InquiryID")
                         .HasColumnType("integer");
@@ -124,7 +137,7 @@ namespace CourierAppBackend.Migrations
                     b.Property<DateTime>("PickupDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("SourceAddressID")
+                    b.Property<int>("SourceAddressId")
                         .HasColumnType("integer");
 
                     b.Property<int>("Status")
@@ -133,29 +146,28 @@ namespace CourierAppBackend.Migrations
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("DestinationAddressID");
+                    b.HasIndex("DestinationAddressId");
 
-                    b.HasIndex("InquiryID");
-
-                    b.HasIndex("SourceAddressID");
+                    b.HasIndex("SourceAddressId");
 
                     b.ToTable("Offers");
                 });
 
-            modelBuilder.Entity("CourierAppBackend.Models.User", b =>
+            modelBuilder.Entity("CourierAppBackend.Models.UserInfo", b =>
                 {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("AddressId")
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<int>("AddressID")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("DefaultSourceAddressID")
+                    b.Property<int?>("DefaultSourceAddressId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Email")
@@ -170,43 +182,32 @@ namespace CourierAppBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.HasKey("UserId");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("integer");
+                    b.HasIndex("AddressId");
 
-                    b.HasKey("ID");
+                    b.HasIndex("DefaultSourceAddressId");
 
-                    b.HasIndex("AddressID");
-
-                    b.HasIndex("DefaultSourceAddressID");
-
-                    b.ToTable("Users");
+                    b.ToTable("UsersInfos");
                 });
 
             modelBuilder.Entity("CourierAppBackend.Models.Inquiry", b =>
                 {
                     b.HasOne("CourierAppBackend.Models.Address", "DestinationAddress")
                         .WithMany()
-                        .HasForeignKey("DestinationAddressID")
+                        .HasForeignKey("DestinationAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CourierAppBackend.Models.Address", "SourceAddress")
                         .WithMany()
-                        .HasForeignKey("SourceAddressID")
+                        .HasForeignKey("SourceAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CourierAppBackend.Models.User", "User")
-                        .WithMany("Inquiries")
-                        .HasForeignKey("UserID");
-
                     b.OwnsOne("CourierAppBackend.Models.Package", "Package", b1 =>
                         {
-                            b1.Property<int>("InquiryID")
+                            b1.Property<int>("InquiryId")
                                 .HasColumnType("integer");
 
                             b1.Property<int>("Height")
@@ -221,12 +222,12 @@ namespace CourierAppBackend.Migrations
                             b1.Property<int>("Width")
                                 .HasColumnType("integer");
 
-                            b1.HasKey("InquiryID");
+                            b1.HasKey("InquiryId");
 
                             b1.ToTable("Inquiries");
 
                             b1.WithOwner()
-                                .HasForeignKey("InquiryID");
+                                .HasForeignKey("InquiryId");
                         });
 
                     b.Navigation("DestinationAddress");
@@ -235,33 +236,25 @@ namespace CourierAppBackend.Migrations
                         .IsRequired();
 
                     b.Navigation("SourceAddress");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CourierAppBackend.Models.Offer", b =>
                 {
                     b.HasOne("CourierAppBackend.Models.Address", "DestinationAddress")
                         .WithMany()
-                        .HasForeignKey("DestinationAddressID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CourierAppBackend.Models.Inquiry", "Inquiry")
-                        .WithMany()
-                        .HasForeignKey("InquiryID")
+                        .HasForeignKey("DestinationAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CourierAppBackend.Models.Address", "SourceAddress")
                         .WithMany()
-                        .HasForeignKey("SourceAddressID")
+                        .HasForeignKey("SourceAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.OwnsOne("CourierAppBackend.Models.Package", "Package", b1 =>
                         {
-                            b1.Property<int>("OfferID")
+                            b1.Property<int>("OfferId")
                                 .HasColumnType("integer");
 
                             b1.Property<int>("Height")
@@ -276,17 +269,17 @@ namespace CourierAppBackend.Migrations
                             b1.Property<int>("Width")
                                 .HasColumnType("integer");
 
-                            b1.HasKey("OfferID");
+                            b1.HasKey("OfferId");
 
                             b1.ToTable("Offers");
 
                             b1.WithOwner()
-                                .HasForeignKey("OfferID");
+                                .HasForeignKey("OfferId");
                         });
 
                     b.OwnsOne("CourierAppBackend.Models.Price", "Price", b1 =>
                         {
-                            b1.Property<int>("OfferID")
+                            b1.Property<int>("OfferId")
                                 .HasColumnType("integer");
 
                             b1.Property<float>("Fees")
@@ -301,17 +294,15 @@ namespace CourierAppBackend.Migrations
                             b1.Property<float>("Value")
                                 .HasColumnType("real");
 
-                            b1.HasKey("OfferID");
+                            b1.HasKey("OfferId");
 
                             b1.ToTable("Offers");
 
                             b1.WithOwner()
-                                .HasForeignKey("OfferID");
+                                .HasForeignKey("OfferId");
                         });
 
                     b.Navigation("DestinationAddress");
-
-                    b.Navigation("Inquiry");
 
                     b.Navigation("Package")
                         .IsRequired();
@@ -322,28 +313,19 @@ namespace CourierAppBackend.Migrations
                     b.Navigation("SourceAddress");
                 });
 
-            modelBuilder.Entity("CourierAppBackend.Models.User", b =>
+            modelBuilder.Entity("CourierAppBackend.Models.UserInfo", b =>
                 {
                     b.HasOne("CourierAppBackend.Models.Address", "Address")
                         .WithMany()
-                        .HasForeignKey("AddressID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AddressId");
 
                     b.HasOne("CourierAppBackend.Models.Address", "DefaultSourceAddress")
                         .WithMany()
-                        .HasForeignKey("DefaultSourceAddressID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DefaultSourceAddressId");
 
                     b.Navigation("Address");
 
                     b.Navigation("DefaultSourceAddress");
-                });
-
-            modelBuilder.Entity("CourierAppBackend.Models.User", b =>
-                {
-                    b.Navigation("Inquiries");
                 });
 #pragma warning restore 612, 618
         }
