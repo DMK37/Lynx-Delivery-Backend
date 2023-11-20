@@ -1,4 +1,5 @@
 using CourierAppBackend.Abstractions;
+using CourierAppBackend.DtoModels;
 using CourierAppBackend.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,17 +42,35 @@ public class DbInquiriesRepository : IInquiriesRepository
         return result!;
     }
 
-    public Inquiry CreateInquiry(Inquiry inquiry)
+    public Inquiry CreateInquiry(CreateInquiry inquiry)
     {
-        if (inquiry is null)
-            return inquiry!;
-
-        inquiry.DateOfInquiring = DateTime.UtcNow;
-        inquiry.SourceAddress = _addressesRepository.FindOrAddAddress(inquiry.SourceAddress);
+        /*if (inquiry is null)
+            return inquiry!;*/
+        Inquiry inq = new Inquiry
+        {
+            DateOfInquiring = DateTime.UtcNow,
+            SourceAddress = _addressesRepository.FindOrAddAddress(inquiry.SourceAddress),
+            DestinationAddress = _addressesRepository.FindOrAddAddress(inquiry.DestinationAddress),
+            Package = new Package
+            {
+                Height = inquiry.Package.Height,
+                Width = inquiry.Package.Width,
+                Length = inquiry.Package.Length,
+                Weight = inquiry.Package.Weight
+            },
+            IsCompany = inquiry.IsCompany,
+            HighPriority = inquiry.HighPriority,
+            DeliveryAtWeekend = inquiry.DeliveryAtWeekend,
+            PickupDate = inquiry.PickupDate,
+            DeliveryDate = inquiry.DeliveryDate,
+            UserId = inquiry.UserId
+        };
+        //inquiry = DateTime.UtcNow;
+        //inquiry.SourceAddress = _addressesRepository.FindOrAddAddress(inquiry.SourceAddress);
         inquiry.DestinationAddress = _addressesRepository.FindOrAddAddress(inquiry.DestinationAddress);
 
-        _context.Add(inquiry);
+        _context.Add(inq);
         _context.SaveChanges();
-        return inquiry;
+        return inq;
     }
 }

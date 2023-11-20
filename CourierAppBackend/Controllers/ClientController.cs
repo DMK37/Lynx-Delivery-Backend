@@ -3,6 +3,7 @@ using CourierAppBackend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace CourierAppBackend.Controllers;
 
@@ -25,10 +26,7 @@ public class ClientController: ControllerBase
     [Authorize("edit:profile")]
     public ActionResult<UserInfo> CreateUserInfo([FromBody] UserInfo userInfo)
     {
-        var tokenString = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-        var handler = new JwtSecurityTokenHandler();
-        var jsonToken = handler.ReadToken(tokenString) as JwtSecurityToken;
-        var userId = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "sub")?.Value;
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
         userInfo.UserId = userId!;
 
         var userInf = _usersInfosRepo.CreateUserInfo(userInfo);
@@ -48,9 +46,16 @@ public class ClientController: ControllerBase
         return Ok(inquiries);
     }
     
-    [HttpGet("user-info/{userId}")]
-    public ActionResult<Offer> GetUserInfo( string userId)
+    [HttpGet("user-info")]
+    [Authorize("get:profile")]
+    public ActionResult<Offer> GetUserInfo()
     {
+
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized("Provide userId in token");
+        }
         var offer = _usersInfosRepo.GetUserInfoById(userId);
         if (offer is null)
             return NotFound("User Not Found");

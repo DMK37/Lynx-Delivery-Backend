@@ -43,6 +43,8 @@ builder.Services.AddAuthorization(options =>
         policy => { policy.Requirements.Add(new RbacRequirement("read:inquiries")); });
     options.AddPolicy("edit:profile",
         policy => { policy.Requirements.Add(new RbacRequirement("edit:profile")); });
+    options.AddPolicy("get:profile",
+        policy => { policy.Requirements.Add(new RbacRequirement("get:profile")); });
 });
 builder.Services.AddSingleton<IAuthorizationHandler, RbacHandler>();
 

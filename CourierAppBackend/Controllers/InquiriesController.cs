@@ -1,4 +1,5 @@
 ﻿using CourierAppBackend.Abstractions;
+using CourierAppBackend.DtoModels;
 using CourierAppBackend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,12 +40,12 @@ public class InquiriesController : ControllerBase
 
     // POST: api/inquiries
     [HttpPost]
-    public IActionResult CreateInquiry(Inquiry inquiry)
+    public ActionResult<Inquiry> CreateInquiry([FromBody]CreateInquiry inquiry)
     {
         var createdInquiry = _inquiriesRepository.CreateInquiry(inquiry);
         if (createdInquiry is null)
             return BadRequest();
-        return CreatedAtRoute("Get", new { ID = inquiry.Id }, inquiry);
+        return CreatedAtRoute("Get", new { ID = createdInquiry.Id }, inquiry);
     }
 
 }

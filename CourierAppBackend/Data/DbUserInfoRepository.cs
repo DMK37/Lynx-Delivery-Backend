@@ -1,5 +1,6 @@
 using CourierAppBackend.Abstractions;
 using CourierAppBackend.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CourierAppBackend.Data;
 
@@ -17,7 +18,11 @@ public class DbUserInfoRepository : IUserInfoRepository
 
     public UserInfo? GetUserInfoById(string id)
     {
-        return _context.UsersInfos.Find(id);
+        var user = (from u in _context.UsersInfos
+            where u.UserId == id
+            select u).Include(u => u.Address)
+            .Include(u => u.DefaultSourceAddress).FirstOrDefault();
+        return user;
     }
 
     public UserInfo CreateUserInfo(UserInfo userInfo)
