@@ -5,8 +5,8 @@ namespace CourierAppBackend.Abstractions;
 
 public interface IInquiriesRepository
 {
-    List<Inquiry> GetLastInquiries(string userId);
-    Inquiry GetInquiryById(int id);
-    List<Inquiry> GetAll();
-    Inquiry CreateInquiry(CreateInquiry inquiry);
+    Task<List<Inquiry>> GetLastInquiries(string userId);
+    Task<Inquiry> GetInquiryById(int id);
+    Task<List<Inquiry>> GetAll();
+    Task<Inquiry> CreateInquiry(CreateInquiry inquiry);
 }

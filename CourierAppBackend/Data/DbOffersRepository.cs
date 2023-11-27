@@ -15,7 +15,7 @@ namespace CourierAppBackend.Data
             _addressesRepository = addressesRepository;
         }
 
-        public Offer CreateNewOffer(CreateOffer createOffer)
+        public async Task<Offer> CreateNewOffer(CreateOffer createOffer)
         {
             Address source = new()
             {
@@ -34,8 +34,8 @@ namespace CourierAppBackend.Data
                 HouseNumber = createOffer.DestinationAddress.HouseNumber,
                 ApartmentNumber = createOffer.DestinationAddress.ApartmentNumber
             };
-            source = _addressesRepository.FindOrAddAddress(source);
-            destination = _addressesRepository.FindOrAddAddress(destination);
+            source = await _addressesRepository.FindOrAddAddress(source);
+            destination = await _addressesRepository.FindOrAddAddress(destination);
             // Calculate price for a package
             Price price = new()
             {
@@ -61,17 +61,17 @@ namespace CourierAppBackend.Data
                 Price = price
             };
 
-            _context.Offers.Add(offer);
-            _context.SaveChanges();
+            await _context.Offers.AddAsync(offer);
+            await _context.SaveChangesAsync();
             return offer;
         }
 
-        public Offer GetOfferById(int ID)
+        public async Task<Offer> GetOfferById(int ID)
         {
-            var result = _context.Offers
+            var result = await _context.Offers
             .Include(x => x.SourceAddress)
             .Include(x => x.DestinationAddress)
-            .FirstOrDefault(x => x.Id == ID);
+            .FirstOrDefaultAsync(x => x.Id == ID);
             return result!;
         }
     }

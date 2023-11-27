@@ -2,7 +2,6 @@ using CourierAppBackend.Abstractions;
 using CourierAppBackend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace CourierAppBackend.Controllers;
@@ -24,21 +23,23 @@ public class ClientController: ControllerBase
 
     [HttpPost("user-info")]
     [Authorize("edit:profile")]
-    public ActionResult<UserInfo> CreateUserInfo([FromBody] UserInfo userInfo)
+    public async Task<ActionResult<UserInfo>> CreateUserInfo([FromBody] UserInfo userInfo)
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
         userInfo.UserId = userId!;
 
-        var userInf = _usersInfosRepo.CreateUserInfo(userInfo);
+        var userInf = await _usersInfosRepo.CreateUserInfo(userInfo);
             if(userInf is null)
                 return BadRequest();
             return CreatedAtRoute("Get", new { ID = userInfo.UserId }, userInfo);
     }
 
-    [HttpGet("{id}/inquiries")]
-    public ActionResult<List<Inquiry>> GetLastInquiries(string id)
+    [HttpGet("inquiries")]
+    [Authorize("get:last-inquiries")]
+    public async Task<ActionResult<List<Inquiry>>> GetLastInquiries()
     {
-        var inquiries = _inquiriesRepository.GetLastInquiries(id);
+        string userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
+        var inquiries = await _inquiriesRepository.GetLastInquiries(userId);
         if (inquiries.Count == 0)
         {
             return NotFound();
@@ -48,7 +49,7 @@ public class ClientController: ControllerBase
     
     [HttpGet("user-info")]
     [Authorize("get:profile")]
-    public ActionResult<Offer> GetUserInfo()
+    public async Task<ActionResult<Offer>> GetUserInfo()
     {
 
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -56,7 +57,7 @@ public class ClientController: ControllerBase
         {
             return Unauthorized("Provide userId in token");
         }
-        var offer = _usersInfosRepo.GetUserInfoById(userId);
+        var offer = await _usersInfosRepo.GetUserInfoById(userId);
         if (offer is null)
             return NotFound("User Not Found");
         return Ok(offer);

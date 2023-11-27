@@ -19,9 +19,9 @@ public class InquiriesController : ControllerBase
 
     // GET: api/inquiries/{id}
     [HttpGet("{id}", Name ="Get")]
-    public IActionResult GetInquiryById(int id)
+    public async Task<IActionResult> GetInquiryById(int id)
     {
-        var inquiry = _inquiriesRepository.GetInquiryById(id);
+        var inquiry = await _inquiriesRepository.GetInquiryById(id);
         if (inquiry is null)
             return NotFound();
         return Ok(inquiry);
@@ -30,9 +30,9 @@ public class InquiriesController : ControllerBase
     // GET: api/inquiries
     [HttpGet]
     [Authorize("read:inquiries")]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        var inquiries = _inquiriesRepository.GetAll();
+        var inquiries = await _inquiriesRepository.GetAll();
         if (inquiries is null || inquiries.Count == 0)
             return NotFound();
         return Ok(inquiries);
@@ -40,9 +40,9 @@ public class InquiriesController : ControllerBase
 
     // POST: api/inquiries
     [HttpPost]
-    public ActionResult<Inquiry> CreateInquiry([FromBody]CreateInquiry inquiry)
+    public async Task<ActionResult<Inquiry>> CreateInquiry([FromBody]CreateInquiry inquiry)
     {
-        var createdInquiry = _inquiriesRepository.CreateInquiry(inquiry);
+        var createdInquiry = await _inquiriesRepository.CreateInquiry(inquiry);
         if (createdInquiry is null)
             return BadRequest();
         return CreatedAtRoute("Get", new { ID = createdInquiry.Id }, inquiry);

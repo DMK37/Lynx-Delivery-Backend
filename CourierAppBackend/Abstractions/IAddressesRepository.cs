@@ -5,6 +5,6 @@ namespace CourierAppBackend.Abstractions
 {
     public interface IAddressesRepository
     {
-        Address FindOrAddAddress(Address address);
+        Task<Address> FindOrAddAddress(Address address);
     }
 }

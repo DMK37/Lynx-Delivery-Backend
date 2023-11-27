@@ -20,20 +20,20 @@ namespace CourierAppBackend.Controllers
 
         // POST: api/offers
         [HttpPost]
-        public ActionResult<Offer> CreateOffer([FromBody] CreateOffer createOffer)
+        public async Task<ActionResult<Offer>> CreateOffer([FromBody] CreateOffer createOffer)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
-            var offer = _offersRepository.CreateNewOffer(createOffer);
+            var offer = await _offersRepository.CreateNewOffer(createOffer);
             if(offer is null)
                 return BadRequest();
             return CreatedAtRoute("Get", new { ID = offer.Id }, offer);
         }
         // GET: api/offers/{id}
         [HttpGet]
-        public ActionResult<Offer> GetOffer(int id)
+        public async Task<ActionResult<Offer>> GetOffer(int id)
         {
-            var offer = _offersRepository.GetOfferById(id);
+            var offer = await _offersRepository.GetOfferById(id);
             if (offer is null)
                 return NotFound();
             return Ok(offer);

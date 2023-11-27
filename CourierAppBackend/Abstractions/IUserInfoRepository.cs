@@ -3,6 +3,6 @@ namespace CourierAppBackend.Abstractions;
 
 public interface IUserInfoRepository
 {   
-    UserInfo? GetUserInfoById(string id);
-    UserInfo CreateUserInfo(UserInfo userInfo);
+    Task<UserInfo?> GetUserInfoById(string id);
+    Task<UserInfo> CreateUserInfo(UserInfo userInfo);
 }
