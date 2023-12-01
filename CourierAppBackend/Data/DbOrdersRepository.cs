@@ -49,6 +49,8 @@ namespace CourierAppBackend.Data
                 LastUpdate = DateTime.UtcNow,
                 CourierName = ""
             };
+            await _context.Orders.AddAsync(order);
+            await _context.SaveChangesAsync();
             return order;
         }
         public async Task<Order?> UpdateOrder(int id, OrderU orderU)
