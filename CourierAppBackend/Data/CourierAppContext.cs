@@ -8,6 +8,8 @@ public class CourierAppContext : DbContext
     public DbSet<Inquiry> Inquiries { get; set; }
     public DbSet<Offer> Offers { get; set; }
     public DbSet<Address> Addresses { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<CustomerInfo> CustomerInfos { get; set; }
     public CourierAppContext(DbContextOptions options)
         : base(options)
     {

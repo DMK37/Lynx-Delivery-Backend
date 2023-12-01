@@ -8,5 +8,5 @@ public interface IInquiriesRepository
     Task<List<Inquiry>> GetLastInquiries(string userId);
     Task<Inquiry> GetInquiryById(int id);
     Task<List<Inquiry>> GetAll();
-    Task<Inquiry> CreateInquiry(CreateInquiry inquiry);
+    Task<Inquiry> CreateInquiry(InquiryC inquiry);
 }

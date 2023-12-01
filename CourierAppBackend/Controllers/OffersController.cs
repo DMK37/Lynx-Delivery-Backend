@@ -22,7 +22,7 @@ namespace CourierAppBackend.Controllers
         // for other groups
         // POST: api/offers
         [HttpPost]
-        public async Task<ActionResult<Offer>> CreateOffer([FromBody] CreateOffer createOffer)
+        public async Task<ActionResult<Offer>> CreateOffer([FromBody] OfferC createOffer)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -35,7 +35,7 @@ namespace CourierAppBackend.Controllers
         // endpoint to get offers from all couriers
         // POST: api/offers/getAll
         [HttpPost("getAll")]
-        public async Task<ActionResult<Offer>> CreateOffers([FromBody] CreateAllOffers createOffers)
+        public async Task<ActionResult<Offer>> CreateOffers([FromBody] OfferAll createOffers)
         {
             if (!ModelState.IsValid)
                 return BadRequest();

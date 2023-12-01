@@ -40,7 +40,8 @@ public class InquiriesController : ControllerBase
 
     // POST: api/inquiries
     [HttpPost]
-    public async Task<ActionResult<Inquiry>> CreateInquiry([FromBody]CreateInquiry inquiry)
+    [ProducesResponseType(typeof(Inquiry),StatusCodes.Status201Created)]
+    public async Task<ActionResult<Inquiry>> CreateInquiry([FromBody]InquiryC inquiry)
     {
         var createdInquiry = await _inquiriesRepository.CreateInquiry(inquiry);
         if (createdInquiry is null)

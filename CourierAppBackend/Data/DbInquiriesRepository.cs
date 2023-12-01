@@ -42,35 +42,30 @@ public class DbInquiriesRepository : IInquiriesRepository
         return result!;
     }
 
-    public async Task<Inquiry> CreateInquiry(CreateInquiry inquiry)
+    public async Task<Inquiry> CreateInquiry(InquiryC inquiryC)
     {
-        /*if (inquiry is null)
-            return inquiry!;*/
-        Inquiry inq = new Inquiry
+        var source = await _addressesRepository.FindAddress(inquiryC.SourceAddress);
+        source ??= await _addressesRepository.AddAddress(inquiryC.SourceAddress);
+        var destination = await _addressesRepository.FindAddress(inquiryC.DestinationAddress);
+        destination ??= await _addressesRepository.AddAddress(inquiryC.DestinationAddress);
+
+        Inquiry inquiry = new()
         {
             DateOfInquiring = DateTime.UtcNow,
-            SourceAddress = await _addressesRepository.FindOrAddAddress(inquiry.SourceAddress),
-            DestinationAddress = await _addressesRepository.FindOrAddAddress(inquiry.DestinationAddress),
-            Package = new Package
-            {
-                Height = inquiry.Package.Height,
-                Width = inquiry.Package.Width,
-                Length = inquiry.Package.Length,
-                Weight = inquiry.Package.Weight
-            },
-            IsCompany = inquiry.IsCompany,
-            HighPriority = inquiry.HighPriority,
-            DeliveryAtWeekend = inquiry.DeliveryAtWeekend,
-            PickupDate = inquiry.PickupDate,
-            DeliveryDate = inquiry.DeliveryDate,
-            UserId = inquiry.UserId
+            SourceAddress = source,
+            DestinationAddress = destination,
+            Package = inquiryC.Package,
+            IsCompany = inquiryC.IsCompany,
+            HighPriority = inquiryC.HighPriority,
+            DeliveryAtWeekend = inquiryC.DeliveryAtWeekend,
+            PickupDate = inquiryC.PickupDate,
+            DeliveryDate = inquiryC.DeliveryDate,
+            UserId = inquiryC.UserId,
+            CourierCompanyName = "LynxDelivery"        
         };
-        //inquiry = DateTime.UtcNow;
-        //inquiry.SourceAddress = _addressesRepository.FindOrAddAddress(inquiry.SourceAddress);
-        inquiry.DestinationAddress = await _addressesRepository.FindOrAddAddress(inquiry.DestinationAddress);
 
-        await _context.AddAsync(inq);
+        await _context.AddAsync(inquiry);
         await _context.SaveChangesAsync();
-        return inq;
+        return inquiry;
     }
 }

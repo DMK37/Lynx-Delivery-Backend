@@ -18,7 +18,7 @@ namespace CourierAppBackend.Data
             _inquiriesRepository = inquiriesRepository;
         }
 
-        public async Task<Offer> CreateNewOffer(CreateOffer createOffer)
+        public async Task<Offer> CreateNewOffer(OfferC createOffer)
         {
             var source = await _addressesRepository.FindAddress(createOffer.SourceAddress);
             source ??= await _addressesRepository.AddAddress(createOffer.SourceAddress);
@@ -69,7 +69,7 @@ namespace CourierAppBackend.Data
             return offer;
         }
 
-        public async Task<Offer> CreateOffferFromOurInquiry(CreateAllOffers createOffers)
+        public async Task<Offer> CreateOffferFromOurInquiry(OfferAll createOffers)
         {
             var inquiry = await _context.Inquiries.FindAsync(createOffers.InquiryID);
             if (inquiry is null)

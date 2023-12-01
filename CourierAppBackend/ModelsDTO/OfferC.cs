@@ -2,7 +2,7 @@
 
 namespace CourierAppBackend.DtoModels
 {
-    public class CreateOffer
+    public class OfferC
     {
         public DateTime PickupDate { get; set; }
         public DateTime DeliveryDate { get; set; }

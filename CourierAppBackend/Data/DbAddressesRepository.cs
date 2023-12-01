@@ -33,6 +33,8 @@ public class DbAddressesRepository : IAddressesRepository
             HouseNumber = address.HouseNumber,
         };
         await _context.Addresses.AddAsync(newAddress);
+        await _context.SaveChangesAsync();
+
         return newAddress;
     }
     public async Task<Address> FindOrAddAddress(Address address)

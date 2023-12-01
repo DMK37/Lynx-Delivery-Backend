@@ -1,6 +1,6 @@
 ﻿namespace CourierAppBackend.ModelsDTO;
 
-public class CreateAllOffers
+public class OfferAll
 {
     public int InquiryID {  get; set; }
 }
