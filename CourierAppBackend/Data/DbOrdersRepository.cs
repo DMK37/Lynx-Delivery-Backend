@@ -58,6 +58,7 @@ namespace CourierAppBackend.Data
             var order = await _context.Orders.FindAsync(id);
             if (order is null)
                 return null;
+            order.OrderStatus = orderU.OrderStatus;
             order.CourierName = orderU.CourierName;
             order.LastUpdate = DateTime.UtcNow;
             order.Comment = orderU.Comment;
