@@ -61,6 +61,7 @@ builder.Services.AddScoped<IInquiriesRepository, DbInquiriesRepository>();
 builder.Services.AddScoped<IAddressesRepository, DbAddressesRepository>();
 builder.Services.AddScoped<IUserInfoRepository, DbUserInfoRepository>();
 builder.Services.AddScoped<IOffersRepository, DbOffersRepository>();
+builder.Services.AddScoped<IOrdersRepository, DbOrdersRepository>();
 
 builder.Services.AddDbContext<CourierAppContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("MainDatabase")));
