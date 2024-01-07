@@ -11,7 +11,9 @@ namespace CourierAppBackend.Data
         private readonly CourierAppContext _context;
         private readonly IAddressesRepository _addressesRepository;
         private readonly IInquiriesRepository _inquiriesRepository;
-        public DbOffersRepository(CourierAppContext context, IAddressesRepository addressesRepository, IInquiriesRepository inquiriesRepository)
+
+        public DbOffersRepository(CourierAppContext context, IAddressesRepository addressesRepository,
+            IInquiriesRepository inquiriesRepository)
         {
             _context = context;
             _addressesRepository = addressesRepository;
@@ -74,7 +76,7 @@ namespace CourierAppBackend.Data
             var inquiry = await _context.Inquiries.FindAsync(createOffers.InquiryID);
             if (inquiry is null)
                 return null!;
-            
+
             //also need to calulate price
             Price price = new()
             {
@@ -103,16 +105,20 @@ namespace CourierAppBackend.Data
         public async Task<Offer> GetOfferById(int ID)
         {
             var result = await _context.Offers
-            .Include(x => x.Inquiry)
-            .Include(x=>x.Inquiry.SourceAddress)
-            .Include(x=>x.Inquiry.DestinationAddress)
-            .FirstOrDefaultAsync(x => x.Id == ID);
+                .Include(x => x.Inquiry)
+                .Include(x => x.Inquiry.SourceAddress)
+                .Include(x => x.Inquiry.DestinationAddress)
+                .FirstOrDefaultAsync(x => x.Id == ID);
             return result!;
         }
 
         public async Task<List<Offer>> GetOffers()
         {
-            var res = await _context.Offers.ToListAsync();
+            var res = await _context.Offers
+                .Include(x => x.Inquiry)
+                .Include(x => x.Inquiry.SourceAddress)
+                .Include(x => x.Inquiry.DestinationAddress)
+                .ToListAsync();
             return res;
         }
     }

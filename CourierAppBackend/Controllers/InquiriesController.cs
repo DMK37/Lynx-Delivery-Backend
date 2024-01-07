@@ -18,7 +18,7 @@ public class InquiriesController : ControllerBase
     }
 
     // GET: api/inquiries/{id}
-    [HttpGet("{id}", Name ="Get")]
+    [HttpGet("{id}")]
     public async Task<IActionResult> GetInquiryById(int id)
     {
         var inquiry = await _inquiriesRepository.GetInquiryById(id);
@@ -39,14 +39,14 @@ public class InquiriesController : ControllerBase
     }
 
     // POST: api/inquiries
-    [HttpPost]
+    [HttpPost(Name = "PostInquiry")]
     [ProducesResponseType(typeof(Inquiry),StatusCodes.Status201Created)]
     public async Task<ActionResult<Inquiry>> CreateInquiry([FromBody]InquiryC inquiry)
     {
         var createdInquiry = await _inquiriesRepository.CreateInquiry(inquiry);
         if (createdInquiry is null)
             return BadRequest();
-        return CreatedAtRoute("Get", new { ID = createdInquiry.Id }, createdInquiry);
+        return CreatedAtRoute("PostInquiry", new { createdInquiry.Id }, createdInquiry);
     }
 
 }

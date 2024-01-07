@@ -21,7 +21,7 @@ namespace CourierAppBackend.Controllers
         
         // for other groups
         // POST: api/offers
-        [HttpPost]
+        [HttpPost(Name="PostOffer")]
         public async Task<ActionResult<Offer>> CreateOffer([FromBody] OfferC createOffer)
         {
             if (!ModelState.IsValid)
@@ -29,22 +29,22 @@ namespace CourierAppBackend.Controllers
             var offer = await _offersRepository.CreateNewOffer(createOffer);
             if(offer is null)
                 return BadRequest();
-            return CreatedAtRoute("Get", new { ID = offer.Id }, offer);
+            return CreatedAtRoute("PostOffer", new { ID = offer.Id }, offer);
         }
 
         // endpoint to get offers from all couriers
         // POST: api/offers/getAll
-        [HttpPost("getAll")]
+        [HttpPost("getAll", Name = "PostOffers")]
         public async Task<ActionResult<Offer>> CreateOffers([FromBody] OfferAll createOffers)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
-
+            
             // TODO: create a way to manage different API's
             var offer = await _offersRepository.CreateOffferFromOurInquiry(createOffers);
             if (offer is null)
                 return BadRequest();
-            return CreatedAtRoute("Get", new { ID = offer.Id }, offer);
+            return CreatedAtRoute("PostOffers", new { ID = offer.Id }, offer);
         }
 
         // GET: api/offers/{id}

@@ -21,7 +21,7 @@ public class ClientController: ControllerBase
     }
 
 
-    [HttpPost("user-info")]
+    [HttpPost("user-info", Name = "PostUserInfo")]
     [Authorize("edit:profile")]
     public async Task<ActionResult<UserInfo>> CreateUserInfo([FromBody] UserInfo userInfo)
     {
@@ -31,7 +31,7 @@ public class ClientController: ControllerBase
         var userInf = await _usersInfosRepo.CreateUserInfo(userInfo);
             if(userInf is null)
                 return BadRequest();
-            return CreatedAtRoute("Get", new { ID = userInfo.UserId }, userInfo);
+            return CreatedAtRoute("PostUserInfo", new { ID = userInfo.UserId }, userInfo);
     }
 
     [HttpGet("inquiries")]

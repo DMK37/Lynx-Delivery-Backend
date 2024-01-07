@@ -38,13 +38,13 @@ namespace CourierAppBackend.Controllers
         }
 
         // POST api/orders
-        [HttpPost]
+        [HttpPost(Name = "PostOrder")]
         public async Task<ActionResult<Order>> CreateOrder([FromBody] OrderC orderC)
         {
             var order = await _ordersRepository.CreateOrder(orderC);
             if (order is null)
                 return BadRequest();
-            return CreatedAtRoute("Get", new { ID = order.Id }, order);
+            return CreatedAtRoute("PostOrder", new { ID = order.Id }, order);
         }
 
         // PATCH api/orders/{id}
