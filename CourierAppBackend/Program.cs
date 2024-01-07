@@ -41,6 +41,12 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("read:inquiries",
         policy => { policy.Requirements.Add(new RbacRequirement("read:inquiries")); });
+    options.AddPolicy("read:all-inquiries",
+        policy => { policy.Requirements.Add(new RbacRequirement("read:all-inquiries")); });
+    options.AddPolicy("read:all-offers",
+        policy => { policy.Requirements.Add(new RbacRequirement("read:all-offers")); });
+    options.AddPolicy("read:all-pending-offers",
+        policy => { policy.Requirements.Add(new RbacRequirement("read:all-pending-offers")); });
     options.AddPolicy("edit:profile",
         policy => { policy.Requirements.Add(new RbacRequirement("edit:profile")); });
     options.AddPolicy("get:profile",

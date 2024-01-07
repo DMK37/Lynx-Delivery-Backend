@@ -9,5 +9,7 @@ namespace CourierAppBackend.Abstractions
         Task<Offer> CreateNewOffer(OfferC createOffer);
         Task<Offer> CreateOffferFromOurInquiry(OfferAll createOffers);
         Task<Offer> GetOfferById(int ID);
+
+        Task<List<Offer>> GetOffers();
     }
 }

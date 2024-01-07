@@ -48,13 +48,23 @@ namespace CourierAppBackend.Controllers
         }
 
         // GET: api/offers/{id}
-        [HttpGet]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Offer>> GetOffer(int id)
         {
             var offer = await _offersRepository.GetOfferById(id);
             if (offer is null)
                 return NotFound();
             return Ok(offer);
+        }
+
+        [HttpGet]
+        [Authorize("read:all-offers")]
+        public async Task<ActionResult<List<Offer>>> GetOffers()
+        {
+            var offers = await _offersRepository.GetOffers();
+            if (offers.Count == 0)
+                return NotFound();
+            return Ok(offers);
         }
     }
 }

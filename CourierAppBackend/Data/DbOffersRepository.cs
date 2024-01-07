@@ -109,5 +109,11 @@ namespace CourierAppBackend.Data
             .FirstOrDefaultAsync(x => x.Id == ID);
             return result!;
         }
+
+        public async Task<List<Offer>> GetOffers()
+        {
+            var res = await _context.Offers.ToListAsync();
+            return res;
+        }
     }
 }

@@ -29,7 +29,7 @@ public class InquiriesController : ControllerBase
 
     // GET: api/inquiries
     [HttpGet]
-    [Authorize("read:inquiries")]
+    [Authorize("read:all-inquiries")]
     public async Task<IActionResult> GetAll()
     {
         var inquiries = await _inquiriesRepository.GetAll();
