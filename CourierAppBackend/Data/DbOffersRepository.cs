@@ -2,6 +2,8 @@
 using CourierAppBackend.DtoModels;
 using CourierAppBackend.Models;
 using CourierAppBackend.ModelsDTO;
+using CourierAppBackend.ModelsPublicDTO;
+using CourierAppBackend.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace CourierAppBackend.Data
@@ -46,14 +48,8 @@ namespace CourierAppBackend.Data
             await _context.Inquiries.AddAsync(inquiry);
             await _context.SaveChangesAsync();
 
-            // TODO: calculate price
-            Price price = new()
-            {
-                Fees = 10,
-                FullPrice = 30,
-                Taxes = 10,
-                Value = 10
-            };
+            var calc = new PriceCalculator();
+            var price = calc.CalculatePrice(inquiry);
 
             Offer offer = new()
             {
@@ -78,13 +74,8 @@ namespace CourierAppBackend.Data
                 return null!;
 
             //also need to calulate price
-            Price price = new()
-            {
-                Fees = 10,
-                FullPrice = 30,
-                Taxes = 10,
-                Value = 10
-            };
+            var calc = new PriceCalculator();
+            var price = calc.CalculatePrice(inquiry);
 
             Offer offer = new()
             {
@@ -120,6 +111,51 @@ namespace CourierAppBackend.Data
                 .Include(x => x.Inquiry.DestinationAddress)
                 .ToListAsync();
             return res;
+        }
+
+        public async Task<Offer> CreateOfferFromRequest(CreateOfferRequest request)
+        {
+            var source = await _addressesRepository.FindAddress(request.SourceAddress);
+            source ??= await _addressesRepository.AddAddress(request.SourceAddress);
+
+            var destination = await _addressesRepository.FindAddress(request.DestinationAddress);
+            destination ??= await _addressesRepository.AddAddress(request.DestinationAddress);
+
+            Inquiry inquiry = new()
+            {
+                DateOfInquiring = DateTime.UtcNow,
+                PickupDate = request.PickupDate,
+                DeliveryDate = request.DeliveryDate,
+                Package = request.Package,
+                SourceAddress = source,
+                DestinationAddress = destination,
+                IsCompany = request.IsCompany,
+                HighPriority = request.HighPriority,
+                DeliveryAtWeekend = request.DeliveryAtWeekend,
+                Status = InquiryStatus.Created,
+                CourierCompanyName = "TODO"
+            };
+
+            await _context.Inquiries.AddAsync(inquiry);
+            await _context.SaveChangesAsync();
+
+            var calc = new PriceCalculator();
+            var price = calc.CalculatePrice(inquiry);
+
+            Offer offer = new()
+            {
+                Inquiry = inquiry,
+                CreationDate = DateTime.UtcNow,
+                ExpireDate = DateTime.UtcNow.AddMinutes(15),
+                UpdateDate = DateTime.UtcNow,
+                Status = OfferStatus.Offered,
+                Price = price
+            };
+
+            await _context.Offers.AddAsync(offer);
+            await _context.SaveChangesAsync();
+
+            return offer;
         }
     }
 }

@@ -7,7 +7,10 @@ namespace CourierAppBackend.Models;
 public class Price
 {
     public decimal FullPrice { get; set; }
-    public decimal Taxes { get; set; }
-    public decimal Fees { get; set; }
-    public decimal Value { get; set; }
+    public decimal BaseDeliveryPrice { get; set; }
+    public decimal WeightFee { get; set; }
+    public decimal SizeFee { get; set; }
+    public decimal PriorityFee { get; set; }
+    public decimal DeliveryAtWeekendFee { get; set; }
+    public string Currency { get; set; } = "PLN";
 }

@@ -7,6 +7,7 @@ using System.Security.Claims;
 namespace CourierAppBackend.Controllers;
 
 [ApiController]
+[ApiExplorerSettings(GroupName = "private")]
 [Route("api/client")]
 public class ClientController: ControllerBase
 {

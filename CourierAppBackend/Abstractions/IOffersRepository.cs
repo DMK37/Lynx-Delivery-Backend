@@ -1,6 +1,7 @@
 ﻿using CourierAppBackend.DtoModels;
 using CourierAppBackend.Models;
 using CourierAppBackend.ModelsDTO;
+using CourierAppBackend.ModelsPublicDTO;
 
 namespace CourierAppBackend.Abstractions
 {
@@ -11,5 +12,7 @@ namespace CourierAppBackend.Abstractions
         Task<Offer> GetOfferById(int ID);
 
         Task<List<Offer>> GetOffers();
+
+        Task<Offer> CreateOfferFromRequest(CreateOfferRequest request);
     }
 }

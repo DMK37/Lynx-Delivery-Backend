@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CourierAppBackend.Controllers;
 
 [ApiController]
+[ApiExplorerSettings(GroupName = "private")]
 [Route("api/inquiries")]
 public class InquiriesController : ControllerBase
 {

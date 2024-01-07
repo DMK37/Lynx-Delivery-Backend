@@ -3,6 +3,7 @@ using System;
 using CourierAppBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CourierAppBackend.Migrations
 {
     [DbContext(typeof(CourierAppContext))]
-    partial class CourierAppContextModelSnapshot : ModelSnapshot
+    [Migration("20240107221732_ModelChange")]
+    partial class ModelChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,7 +55,7 @@ namespace CourierAppBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Addresses", (string)null);
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("CourierAppBackend.Models.CustomerInfo", b =>
@@ -85,7 +88,7 @@ namespace CourierAppBackend.Migrations
 
                     b.HasIndex("AddressId");
 
-                    b.ToTable("CustomerInfos", (string)null);
+                    b.ToTable("CustomerInfos");
                 });
 
             modelBuilder.Entity("CourierAppBackend.Models.Inquiry", b =>
@@ -141,7 +144,7 @@ namespace CourierAppBackend.Migrations
 
                     b.HasIndex("SourceAddressId");
 
-                    b.ToTable("Inquiries", (string)null);
+                    b.ToTable("Inquiries");
                 });
 
             modelBuilder.Entity("CourierAppBackend.Models.Offer", b =>
@@ -177,7 +180,7 @@ namespace CourierAppBackend.Migrations
 
                     b.HasIndex("CustomerInfoId");
 
-                    b.ToTable("Offers", (string)null);
+                    b.ToTable("Offers");
                 });
 
             modelBuilder.Entity("CourierAppBackend.Models.Order", b =>
@@ -211,7 +214,7 @@ namespace CourierAppBackend.Migrations
 
                     b.HasIndex("OfferId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("CourierAppBackend.Models.UserInfo", b =>
@@ -247,7 +250,7 @@ namespace CourierAppBackend.Migrations
 
                     b.HasIndex("DefaultSourceAddressId");
 
-                    b.ToTable("UsersInfos", (string)null);
+                    b.ToTable("UsersInfos");
                 });
 
             modelBuilder.Entity("CourierAppBackend.Models.CustomerInfo", b =>
@@ -279,7 +282,7 @@ namespace CourierAppBackend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("CourierAppBackend.Models.Inquiry.Package#CourierAppBackend.Models.Package", "Package", b1 =>
+                    b.OwnsOne("CourierAppBackend.Models.Package", "Package", b1 =>
                         {
                             b1.Property<int>("InquiryId")
                                 .HasColumnType("integer");
@@ -298,7 +301,7 @@ namespace CourierAppBackend.Migrations
 
                             b1.HasKey("InquiryId");
 
-                            b1.ToTable("Inquiries", (string)null);
+                            b1.ToTable("Inquiries");
 
                             b1.WithOwner()
                                 .HasForeignKey("InquiryId");
@@ -318,7 +321,7 @@ namespace CourierAppBackend.Migrations
                         .WithMany()
                         .HasForeignKey("CustomerInfoId");
 
-                    b.OwnsOne("CourierAppBackend.Models.Offer.Price#CourierAppBackend.Models.Price", "Price", b1 =>
+                    b.OwnsOne("CourierAppBackend.Models.Price", "Price", b1 =>
                         {
                             b1.Property<int>("OfferId")
                                 .HasColumnType("integer");
@@ -347,7 +350,7 @@ namespace CourierAppBackend.Migrations
 
                             b1.HasKey("OfferId");
 
-                            b1.ToTable("Offers", (string)null);
+                            b1.ToTable("Offers");
 
                             b1.WithOwner()
                                 .HasForeignKey("OfferId");

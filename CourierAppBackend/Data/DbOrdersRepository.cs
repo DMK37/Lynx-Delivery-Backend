@@ -46,7 +46,7 @@ namespace CourierAppBackend.Data
                 OfferID = offer.Id,
                 Offer = offer,
                 OrderStatus = OrderStatus.Accepted,
-                LastUpdate = DateTime.UtcNow,
+                LastUpdate = DateTime.Now,
                 CourierName = ""
             };
             await _context.Orders.AddAsync(order);
@@ -60,7 +60,7 @@ namespace CourierAppBackend.Data
                 return null;
             order.OrderStatus = orderU.OrderStatus;
             order.CourierName = orderU.CourierName;
-            order.LastUpdate = DateTime.UtcNow;
+            order.LastUpdate = DateTime.Now;
             order.Comment = orderU.Comment;
             await _context.SaveChangesAsync();
             return order;

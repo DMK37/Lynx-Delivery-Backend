@@ -11,6 +11,7 @@ namespace CourierAppBackend.Controllers
 {
     [Route("api/offers")]
     [ApiController]
+    [ApiExplorerSettings(GroupName = "private")]
     public class OffersController : ControllerBase
     {
         private readonly IOffersRepository _offersRepository;

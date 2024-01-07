@@ -9,6 +9,7 @@ namespace CourierAppBackend.Controllers
 {
     [Route("api/orders")]
     [ApiController]
+    [ApiExplorerSettings(GroupName = "private")]
     public class OrdersController : ControllerBase
     {
         private IOrdersRepository _ordersRepository;
