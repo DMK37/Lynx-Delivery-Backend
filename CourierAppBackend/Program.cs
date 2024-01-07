@@ -1,11 +1,13 @@
 using CourierAppBackend.Abstractions;
 using CourierAppBackend.Auth;
 using CourierAppBackend.Data;
+using CourierAppBackend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SendGrid.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +102,11 @@ builder.Services.AddScoped<IOrdersRepository, DbOrdersRepository>();
 
 builder.Services.AddDbContext<CourierAppContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("MainDatabase")));
+
+builder.Services.AddSendGrid(options =>
+            options.ApiKey = builder.Configuration["SENDGRID_API_KEY"]
+        );
+builder.Services.AddTransient<EmailSender>();
 
 var app = builder.Build();
 

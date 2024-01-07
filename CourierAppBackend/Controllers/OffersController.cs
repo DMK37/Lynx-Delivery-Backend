@@ -15,6 +15,7 @@ namespace CourierAppBackend.Controllers
     public class OffersController : ControllerBase
     {
         private readonly IOffersRepository _offersRepository;
+
         public OffersController(IOffersRepository offersRepository)
         {
             _offersRepository = offersRepository;

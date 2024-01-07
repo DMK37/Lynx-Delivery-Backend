@@ -1,6 +1,7 @@
 ﻿using CourierAppBackend.Abstractions;
 using CourierAppBackend.Models;
 using CourierAppBackend.ModelsDTO;
+using CourierAppBackend.Services;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -13,9 +14,11 @@ namespace CourierAppBackend.Controllers
     public class OrdersController : ControllerBase
     {
         private IOrdersRepository _ordersRepository;
-        public OrdersController(IOrdersRepository ordersRepository)
+        private EmailSender _emailSender;
+        public OrdersController(IOrdersRepository ordersRepository, EmailSender emailSender)
         {
             _ordersRepository = ordersRepository;
+            _emailSender = emailSender;
         }
         // for courier 
         // GET: api/orders
@@ -45,6 +48,7 @@ namespace CourierAppBackend.Controllers
             var order = await _ordersRepository.CreateOrder(orderC);
             if (order is null)
                 return BadRequest();
+            await _emailSender.SendOrderCreatedMessage(order);
             return CreatedAtRoute("PostOrder", new { ID = order.Id }, order);
         }
 
