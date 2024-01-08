@@ -190,5 +190,29 @@ namespace CourierAppBackend.Data
 
             return offer;
         }
+
+        public async Task<Offer> ConfirmOffer(int id, ConfirmOfferRequest request)
+        {
+            var address = await _addressesRepository.FindAddress(request.CustomerInfo.Address);
+            address ??= await _addressesRepository.AddAddress(request.CustomerInfo.Address);
+
+            var offer = _context.Offers.FirstOrDefault(x => x.Id == id);
+            if (offer == null)
+                return null!;
+            offer.Status = OfferStatus.Pending;
+            offer.UpdateDate = DateTime.UtcNow;
+            offer.CustomerInfo = new()
+            {
+                CompanyName = request.CustomerInfo.CompanyName,
+                FirstName = request.CustomerInfo.FirstName,
+                LastName = request.CustomerInfo.LastName,
+                Address = address,
+                Email = request.CustomerInfo.Email
+            };
+
+            await _context.SaveChangesAsync();
+
+            return offer;
+        }
     }
 }

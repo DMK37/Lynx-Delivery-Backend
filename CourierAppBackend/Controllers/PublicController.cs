@@ -2,7 +2,9 @@
 using CourierAppBackend.Auth;
 using CourierAppBackend.DtoModels;
 using CourierAppBackend.Models;
+using CourierAppBackend.ModelsDTO;
 using CourierAppBackend.ModelsPublicDTO;
+using CourierAppBackend.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourierAppBackend.Controllers;
@@ -15,9 +17,13 @@ namespace CourierAppBackend.Controllers;
 public class PublicController : ControllerBase
 {
     private readonly IOffersRepository _offersRepository;
-    public PublicController(IOffersRepository offersRepository)
+    private readonly IOrdersRepository _ordersRepository;
+    private readonly EmailSender _emailSender;
+    public PublicController(IOffersRepository offersRepository,IOrdersRepository ordersRepository, EmailSender emailSender)
     {
         _offersRepository = offersRepository;
+        _ordersRepository = ordersRepository;
+        _emailSender = emailSender;
     }
 
     // POST: api/public/offers
@@ -36,7 +42,20 @@ public class PublicController : ControllerBase
             ExpireDate = offer.ExpireDate,
             Price = offer.Price
         };
-        return CreatedAtRoute("PostOffer", new { ID = response.OfferId }, response);
+        return CreatedAtRoute("GetOffer", new { ID = response.OfferId }, response);
+    }
+
+    [HttpPatch("offers/{id}/confirm")]
+    public async Task<ActionResult<Offer>> ConfirmOffer([FromRoute] int id, [FromBody] ConfirmOfferRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest();
+
+        var offer = await _offersRepository.ConfirmOffer(id, request);
+        if (offer is null)
+            return BadRequest();
+        await _emailSender.SendOfferSelectedMessage(offer);
+        return Ok();
     }
 
     // GET: api/public/offers/{id}
@@ -68,4 +87,24 @@ public class PublicController : ControllerBase
         };
         return Ok(response);
     }
+
+    [HttpGet("orders/{id}", Name = "GetOrder")]
+    public async Task<ActionResult<GetOfferResponse>> GetOrder(int id)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest();
+        var order = await _ordersRepository.GetOrderById(id);
+        if (order is null)
+            return NotFound();
+        var response = new GetOrderResponse
+        {
+            OfferID = order.OfferID,
+            OrderStatus = order.OrderStatus,
+            LastUpdate = order.LastUpdate,
+            Comment = order.Comment,
+            CourierName = order.CourierName
+        };
+        return Ok(response);
+    }
+
 }

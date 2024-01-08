@@ -24,7 +24,7 @@ namespace CourierAppBackend.Data
                         .Include(x => x.Offer.Inquiry)
                         .Include(x => x.Offer.Inquiry.SourceAddress)
                         .Include(x => x.Offer.Inquiry.DestinationAddress)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<List<Order>> GetOrders()
