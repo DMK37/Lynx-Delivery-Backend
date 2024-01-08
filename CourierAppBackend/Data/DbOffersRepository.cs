@@ -113,6 +113,15 @@ namespace CourierAppBackend.Data
             return res;
         }
 
+        public async Task<List<Offer>> GetPendingOffers()
+        {
+            var res = await _context.Offers.Where(x => x.Status == OfferStatus.Pending).Include(x => x.Inquiry)
+                .Include(x => x.Inquiry.SourceAddress)
+                .Include(x => x.Inquiry.DestinationAddress)
+                .ToListAsync();
+            return res;
+        }
+
         public async Task<Offer> CreateOfferFromRequest(CreateOfferRequest request)
         {
             var source = await _addressesRepository.FindAddress(request.SourceAddress);

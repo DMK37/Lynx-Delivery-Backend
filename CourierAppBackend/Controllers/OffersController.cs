@@ -85,5 +85,15 @@ namespace CourierAppBackend.Controllers
                 return NotFound();
             return Ok(offers);
         }
+
+        [HttpGet("pending")]
+        [Authorize("read:all-offers")]
+        public async Task<ActionResult<List<Offer>>> GetPendingOffers()
+        {
+            var offers = await _offersRepository.GetPendingOffers();
+            if (offers.Count == 0)
+                return NotFound();
+            return Ok(offers);
+        }
     }
 }

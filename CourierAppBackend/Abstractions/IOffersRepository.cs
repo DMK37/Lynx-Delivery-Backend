@@ -12,8 +12,12 @@ namespace CourierAppBackend.Abstractions
         Task<Offer> GetOfferById(int ID);
 
         Task<List<Offer>> GetOffers();
+        
+        Task<List<Offer>> GetPendingOffers();
 
         Task<Offer> CreateOfferFromRequest(CreateOfferRequest request);
         Task<Offer> SelectOffer(OfferSelect offerSelect);
+        
+        
     }
 }
