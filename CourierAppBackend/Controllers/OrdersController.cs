@@ -40,7 +40,7 @@ namespace CourierAppBackend.Controllers
                 return NotFound();
             return Ok(order);
         }
-
+        // endpoint for office worker to accept given offer
         // POST api/orders
         [HttpPost(Name = "PostOrder")]
         public async Task<ActionResult<Order>> CreateOrder([FromBody] OrderC orderC)

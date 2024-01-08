@@ -14,5 +14,6 @@ namespace CourierAppBackend.Abstractions
         Task<List<Offer>> GetOffers();
 
         Task<Offer> CreateOfferFromRequest(CreateOfferRequest request);
+        Task<Offer> SelectOffer(OfferSelect offerSelect);
     }
 }

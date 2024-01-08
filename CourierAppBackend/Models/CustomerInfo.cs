@@ -1,8 +1,10 @@
-﻿using System.Security.Policy;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Security.Policy;
 
 namespace CourierAppBackend.Models;
 
-public class CustomerInfo : Base
+[Owned]
+public class CustomerInfo
 {
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;

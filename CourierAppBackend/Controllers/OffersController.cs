@@ -3,6 +3,7 @@ using CourierAppBackend.Data;
 using CourierAppBackend.DtoModels;
 using CourierAppBackend.Models;
 using CourierAppBackend.ModelsDTO;
+using CourierAppBackend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +16,12 @@ namespace CourierAppBackend.Controllers
     public class OffersController : ControllerBase
     {
         private readonly IOffersRepository _offersRepository;
+        private readonly EmailSender _emailSender;
 
-        public OffersController(IOffersRepository offersRepository)
+        public OffersController(IOffersRepository offersRepository, EmailSender emailSender)
         {
             _offersRepository = offersRepository;
+            _emailSender = emailSender;
         }
         
         // for other groups
@@ -46,6 +49,20 @@ namespace CourierAppBackend.Controllers
             var offer = await _offersRepository.CreateOffferFromOurInquiry(createOffers);
             if (offer is null)
                 return BadRequest();
+            return CreatedAtRoute("PostOffers", new { ID = offer.Id }, offer);
+        }
+
+        // endpoint to accept offer providing customer info
+        [HttpPost("{id}/select")]
+        public async Task<ActionResult<Offer>> SelectOffer([FromBody] OfferSelect createOffers)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var offer = await _offersRepository.SelectOffer(createOffers);
+            if (offer is null)
+                return BadRequest();
+            await _emailSender.SendOfferSelectedMessage(offer);
             return CreatedAtRoute("PostOffers", new { ID = offer.Id }, offer);
         }
 
