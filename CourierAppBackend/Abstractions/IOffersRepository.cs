@@ -2,6 +2,7 @@
 using CourierAppBackend.Models;
 using CourierAppBackend.ModelsDTO;
 using CourierAppBackend.ModelsPublicDTO;
+using CourierAppBackend.Services;
 
 namespace CourierAppBackend.Abstractions
 {
@@ -18,6 +19,8 @@ namespace CourierAppBackend.Abstractions
         Task<Offer> CreateOfferFromRequest(CreateOfferRequest request);
         Task<Offer> SelectOffer(OfferSelect offerSelect);
         Task<Offer> ConfirmOffer(int id, ConfirmOfferRequest request);
+
+        Task<List<OfferInfo>> GetOfferInfos(OfferAll createOffers, IEnumerable<IExternalApi> externalApis);
         
         
     }

@@ -3,10 +3,11 @@ using SendGrid.Helpers.Mail;
 using SendGrid;
 using System.Net.Mail;
 using CourierAppBackend.Models;
+using CourierAppBackend.Abstractions;
 
 namespace CourierAppBackend.Services;
 
-public class EmailSender
+public class EmailSender : IMessageSender
 {
     private static EmailAddress from = new("lynxdelivery.courier@gmail.com", "Lynx Delivery");
     private readonly ISendGridClient sendGridClient;

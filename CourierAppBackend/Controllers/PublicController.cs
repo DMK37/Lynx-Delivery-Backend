@@ -18,12 +18,12 @@ public class PublicController : ControllerBase
 {
     private readonly IOffersRepository _offersRepository;
     private readonly IOrdersRepository _ordersRepository;
-    private readonly EmailSender _emailSender;
-    public PublicController(IOffersRepository offersRepository,IOrdersRepository ordersRepository, EmailSender emailSender)
+    private readonly IMessageSender _messageSender;
+    public PublicController(IOffersRepository offersRepository,IOrdersRepository ordersRepository, IMessageSender messageSender)
     {
         _offersRepository = offersRepository;
         _ordersRepository = ordersRepository;
-        _emailSender = emailSender;
+        _messageSender = messageSender;
     }
 
     // POST: api/public/offers
@@ -54,7 +54,7 @@ public class PublicController : ControllerBase
         var offer = await _offersRepository.ConfirmOffer(id, request);
         if (offer is null)
             return BadRequest();
-        await _emailSender.SendOfferSelectedMessage(offer);
+        await _messageSender.SendOfferSelectedMessage(offer);
         return Ok();
     }
 

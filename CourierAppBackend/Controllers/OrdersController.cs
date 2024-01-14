@@ -14,11 +14,15 @@ namespace CourierAppBackend.Controllers
     public class OrdersController : ControllerBase
     {
         private IOrdersRepository _ordersRepository;
-        private EmailSender _emailSender;
-        public OrdersController(IOrdersRepository ordersRepository, EmailSender emailSender)
+        private IInquiriesRepository _inquiriesRepository;
+        private IMessageSender _messageSender;
+        private LecturerApi _contactLecturerApi;
+        public OrdersController(IOrdersRepository ordersRepository, IMessageSender messageSender, LecturerApi api, IInquiriesRepository inquiriesRepository)
         {
             _ordersRepository = ordersRepository;
-            _emailSender = emailSender;
+            _messageSender = messageSender;
+            _contactLecturerApi = api;
+            _inquiriesRepository = inquiriesRepository;
         }
         // for courier 
         // GET: api/orders
@@ -48,7 +52,7 @@ namespace CourierAppBackend.Controllers
             var order = await _ordersRepository.CreateOrder(orderC);
             if (order is null)
                 return BadRequest();
-            await _emailSender.SendOrderCreatedMessage(order);
+            await _messageSender.SendOrderCreatedMessage(order);
             return CreatedAtRoute("PostOrder", new { ID = order.Id }, order);
         }
 
@@ -61,6 +65,14 @@ namespace CourierAppBackend.Controllers
                 return BadRequest();
             return Ok(order);
         }
+        [HttpPost("test")]
+        public async Task<ActionResult> Test()
+        {
+            var inq = await _inquiriesRepository.GetInquiryById(79);
 
+            var sth = await _contactLecturerApi.GetOffer(inq);
+
+            return Ok();
+        }
     }
 }

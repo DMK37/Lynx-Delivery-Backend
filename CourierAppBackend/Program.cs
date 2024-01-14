@@ -1,3 +1,4 @@
+using CourierAppBackend;
 using CourierAppBackend.Abstractions;
 using CourierAppBackend.Auth;
 using CourierAppBackend.Data;
@@ -100,26 +101,29 @@ builder.Services.AddScoped<IUserInfoRepository, DbUserInfoRepository>();
 builder.Services.AddScoped<IOffersRepository, DbOffersRepository>();
 builder.Services.AddScoped<IOrdersRepository, DbOrdersRepository>();
 
+builder.Services.AddScoped<IExternalApi, LecturerApi>();
+builder.Services.AddScoped<IExternalApi, OurApi>();
+builder.Services.AddScoped<IExternalApi, FakeApi>();
+
 builder.Services.AddDbContext<CourierAppContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("MainDatabase")));
 
 builder.Services.AddSendGrid(options =>
             options.ApiKey = builder.Configuration["SENDGRID_API_KEY"]
         );
-builder.Services.AddTransient<EmailSender>();
+builder.Services.AddScoped<IMessageSender, EmailSender>();
+
+
+builder.Services.Configure<ExternalApisOptions>(builder.Configuration.GetSection("ExternalApis"));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/private/swagger.json", "private");
-        c.SwaggerEndpoint("/swagger/public/swagger.json", "public");
-    });
-}
+    c.SwaggerEndpoint("/swagger/private/swagger.json", "private");
+    c.SwaggerEndpoint("/swagger/public/swagger.json", "public");
+});
 
 app.UseHttpsRedirection();
 

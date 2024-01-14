@@ -214,5 +214,50 @@ namespace CourierAppBackend.Data
 
             return offer;
         }
+
+        public async Task<List<OfferInfo>> GetOfferInfos(OfferAll createOffers, IEnumerable<IExternalApi> _externalApis)
+        {
+            var inquiry = await _context.Inquiries.Include(x => x.SourceAddress).Include(x => x.DestinationAddress).FirstOrDefaultAsync(x => x.Id == createOffers.InquiryID);
+            if (inquiry is null)
+                return new List<OfferInfo>();
+            var externalApis = _externalApis.ToList();
+            var tasks = new Task<OfferInfo>[externalApis.Count];
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                tasks[i] = externalApis[i].GetOffer(inquiry);
+            }
+
+            var offerInfos = new List<OfferInfo>();
+
+            Task<OfferInfo> timeoutTask = FakeTask();
+
+            while (tasks.Length > 0)
+            {
+                var completedTask = await Task.WhenAny(tasks.Concat(new[] { timeoutTask }));
+
+                if (completedTask == timeoutTask)
+                {
+                    Console.WriteLine("Timeout reached. Not all requests completed.");
+                    break;
+                }
+
+                tasks = tasks.Where(t => t != completedTask).ToArray();
+                OfferInfo res = await completedTask;
+
+                if (res is not null)
+                {
+                    offerInfos.Add(res);
+                }
+            }
+
+            return offerInfos;
+        }
+
+        public async Task<OfferInfo> FakeTask()
+        {
+            await Task.Delay(30000);
+            return null!;
+        }
     }
 }
+
