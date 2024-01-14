@@ -16,25 +16,25 @@ public class DbUserInfoRepository : IUserInfoRepository
     }
 
 
-    public UserInfo? GetUserInfoById(string id)
+    public async Task<UserInfo?> GetUserInfoById(string id)
     {
-        var user = (from u in _context.UsersInfos
+        var user = await (from u in _context.UsersInfos
             where u.UserId == id
             select u).Include(u => u.Address)
-            .Include(u => u.DefaultSourceAddress).FirstOrDefault();
+            .Include(u => u.DefaultSourceAddress).FirstOrDefaultAsync();
         return user;
     }
 
-    public UserInfo CreateUserInfo(UserInfo userInfo)
+    public async Task<UserInfo> CreateUserInfo(UserInfo userInfo)
     {
-        userInfo.Address = _addressesRepository.FindOrAddAddress(userInfo.Address);
-        userInfo.DefaultSourceAddress = _addressesRepository.FindOrAddAddress(userInfo.DefaultSourceAddress);
-        var usrInfo = (from u in _context.UsersInfos
+        userInfo.Address = await _addressesRepository.FindOrAddAddress(userInfo.Address);
+        userInfo.DefaultSourceAddress = await _addressesRepository.FindOrAddAddress(userInfo.DefaultSourceAddress);
+        var usrInfo = await (from u in _context.UsersInfos
             where u.UserId == userInfo.UserId
-            select u).FirstOrDefault();
+            select u).FirstOrDefaultAsync();
         if (usrInfo == null)
         {
-            _context.UsersInfos.Add(userInfo);
+            await _context.UsersInfos.AddAsync(userInfo);
         }
         else
         {
@@ -44,7 +44,7 @@ public class DbUserInfoRepository : IUserInfoRepository
             usrInfo.LastName = userInfo.LastName;
         }
 
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return userInfo;
     }
 }

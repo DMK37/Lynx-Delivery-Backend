@@ -1,5 +1,6 @@
 ﻿
 using CourierAppBackend.Abstractions;
+using CourierAppBackend.DtoModels;
 using CourierAppBackend.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,17 +13,41 @@ public class DbAddressesRepository : IAddressesRepository
     {
         _context = context;
     }
-    public Address FindOrAddAddress(Address address)
+    public async Task<Address?> FindAddress(AddressDTO address)
     {
-        var resultAddress = _context.Addresses.FirstOrDefault(x => x.City == address.City &&
+        var result = await _context.Addresses.FirstOrDefaultAsync(x => x.City == address.City &&
+                                        x.PostalCode == address.PostalCode &&
+                                        x.Street == address.Street &&
+                                        x.HouseNumber == address.HouseNumber &&
+                                        x.ApartmentNumber == address.ApartmentNumber);
+        return result;
+    }
+    public async Task<Address> AddAddress(AddressDTO address)
+    {
+        Address newAddress = new()
+        {
+            ApartmentNumber = address.ApartmentNumber,
+            City = address.City,
+            PostalCode = address.PostalCode,
+            Street = address.Street,
+            HouseNumber = address.HouseNumber,
+        };
+        await _context.Addresses.AddAsync(newAddress);
+        await _context.SaveChangesAsync();
+
+        return newAddress;
+    }
+    public async Task<Address> FindOrAddAddress(Address address)
+    {
+        var resultAddress = await _context.Addresses.FirstOrDefaultAsync(x => x.City == address.City &&
                                         x.PostalCode == address.PostalCode &&
                                         x.Street == address.Street &&
                                         x.HouseNumber == address.HouseNumber &&
                                         x.ApartmentNumber == address.ApartmentNumber);
         if (resultAddress is null)
         {
-            _context.Addresses.Add(address);
-            _context.SaveChanges();
+            await _context.Addresses.AddAsync(address);
+            await _context.SaveChangesAsync();
             resultAddress = address;
         }
 
