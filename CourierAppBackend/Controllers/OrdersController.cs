@@ -16,8 +16,8 @@ namespace CourierAppBackend.Controllers
         private IOrdersRepository _ordersRepository;
         private IInquiriesRepository _inquiriesRepository;
         private IMessageSender _messageSender;
-        private LecturerApi _contactLecturerApi;
-        public OrdersController(IOrdersRepository ordersRepository, IMessageSender messageSender, LecturerApi api, IInquiriesRepository inquiriesRepository)
+        private IExternalApi _contactLecturerApi;
+        public OrdersController(IOrdersRepository ordersRepository, IMessageSender messageSender, IExternalApi api, IInquiriesRepository inquiriesRepository)
         {
             _ordersRepository = ordersRepository;
             _messageSender = messageSender;
