@@ -69,9 +69,9 @@ namespace CourierAppBackend.Controllers
         [HttpPost("test")]
         public async Task<ActionResult> Test()
         {
-            var inq = await _inquiriesRepository.GetInquiryById(79);
+            //var inq = await _inquiriesRepository.GetInquiryById(79);
 
-            var sth = await _contactLecturerApi.GetOffer(inq);
+            //var sth = await _contactLecturerApi.GetOffer(inq);
 
             return Ok();
         }

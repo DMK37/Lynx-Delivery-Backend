@@ -14,7 +14,7 @@ namespace CourierAppBackend.Data
         private readonly IAddressesRepository _addressesRepository = addressesRepository;
         private readonly IInquiriesRepository _inquiriesRepository = inquiriesRepository;
 
-        public async Task<Offer> CreateNewOffer(OfferC createOffer)
+        public async Task<Offer> CreateOffer(OfferC createOffer)
         {
             var source = await _addressesRepository.AddAddress(createOffer.SourceAddress);
             var destination = await _addressesRepository.AddAddress(createOffer.DestinationAddress);
@@ -200,7 +200,7 @@ namespace CourierAppBackend.Data
             await Task.Delay(30000);
             return null!;
         }
-        public async Task<CreateOfferResponse?> CreateOfferFromRequest(CreateOfferRequest request)
+        public async Task<CreateOfferResponse> CreateOffer(CreateOfferRequest request)
         {
             var source = await _addressesRepository.AddAddress(request.SourceAddress);
             var destination = await _addressesRepository.AddAddress(request.DestinationAddress);

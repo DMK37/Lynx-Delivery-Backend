@@ -1,5 +1,4 @@
 using CourierAppBackend.Abstractions.Repositories;
-using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,21 +12,22 @@ namespace CourierAppBackend.Controllers;
 public class ClientController(IInquiriesRepository repository, IUserRepository usersRepository)
     : ControllerBase
 {
+    // POST: api/client/user-info
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpPost("user-info")]
     [Authorize("edit:profile")]
-    public async Task<ActionResult<UserDTO>> EditUser([FromBody] UserDTO request)
+    public async Task<ActionResult<UserDTO>> EditUser([FromBody] UserDTO userDTO)
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
-        request.UserId = userId;
-        var response = await usersRepository.EditUser(request);
-        return Ok(response);
+        userDTO.UserId = userId;
+        var user = await usersRepository.EditUser(userDTO);
+        return Ok(user);
     }
 
+    // GET: api/client/user-info
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet("user-info")]
@@ -39,19 +39,15 @@ public class ClientController(IInquiriesRepository repository, IUserRepository u
         return response is null ? NotFound("User Not Found") : Ok(response);
     }
 
+    // GET: api/client/inquiries
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet("inquiries")]
     [Authorize("get:last-inquiries")]
-    public async Task<ActionResult<List<Inquiry>>> GetLastInquiries()
+    public async Task<ActionResult<List<InquiryDTO>>> GetLastInquiries()
     {
         string userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
         var inquiries = await repository.GetLastInquiries(userId);
-        if (inquiries.Count == 0)
-        {
-            return NotFound();
-        }
         return Ok(inquiries);
     }
 }

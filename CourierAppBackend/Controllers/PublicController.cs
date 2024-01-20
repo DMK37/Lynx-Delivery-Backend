@@ -7,55 +7,28 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CourierAppBackend.Controllers;
 
-// the controller to use our api for other groups
 [Route("api/public")]
 [ApiController]
 [ApiExplorerSettings(GroupName = "public")]
 [ServiceFilter(typeof(ApiKeyAuthFilter))]
-public class PublicController : ControllerBase
+public class PublicController(IOffersRepository offersRepository, IOrdersRepository ordersRepository, IMessageSender messageSender)
+    : ControllerBase
 {
-    private readonly IOffersRepository _offersRepository;
-    private readonly IOrdersRepository _ordersRepository;
-    private readonly IMessageSender _messageSender;
-    public PublicController(IOffersRepository offersRepository, IOrdersRepository ordersRepository, IMessageSender messageSender)
-    {
-        _offersRepository = offersRepository;
-        _ordersRepository = ordersRepository;
-        _messageSender = messageSender;
-    }
 
-    // POST: api/public/offers
     [HttpPost("offers")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(CreateOfferResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<CreateOfferResponse>> CreateOffer([FromBody] CreateOfferRequest request)
     {
-        var response = await _offersRepository.CreateOfferFromRequest(request);
-        if (response is null)
-            return BadRequest();
-
-        return CreatedAtRoute("GetOffer", new { ID = response.OfferId }, response);
+        var response = await offersRepository.CreateOffer(request);
+        return CreatedAtRoute("GetOffer", new { id = response.OfferId }, response);
     }
 
-    [HttpPatch("offers/{id}/confirm")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<Offer>> ConfirmOffer([FromRoute] int id, [FromBody] ConfirmOfferRequest request)
-    {
-        var offer = await _offersRepository.ConfirmOffer(id, request);
-        if (offer is null)
-            return BadRequest();
-        await _messageSender.SendOfferSelectedMessage(offer);
-        return Ok();
-    }
-
-    // GET: api/public/offers/{id}
     [HttpGet("offers/{id}", Name = "GetOffer")]
     public async Task<ActionResult<GetOfferResponse>> GetOffer(int id)
     {
-        var offer = await _offersRepository.GetOfferById(id);
+        var offer = await offersRepository.GetOfferById(id);
         if (offer is null)
             return NotFound();
         var response = new GetOfferResponse
@@ -79,12 +52,26 @@ public class PublicController : ControllerBase
         return Ok(response);
     }
 
+    [HttpPatch("offers/{id}/confirm")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<Offer>> ConfirmOffer([FromRoute] int id, [FromBody] ConfirmOfferRequest request)
+    {
+        var offer = await offersRepository.ConfirmOffer(id, request);
+        if (offer is null)
+            return BadRequest();
+        await messageSender.SendOfferSelectedMessage(offer);
+        return Ok();
+    }
+
+
     [HttpGet("orders/{id}", Name = "GetOrder")]
     public async Task<ActionResult<GetOfferResponse>> GetOrder(int id)
     {
         if (!ModelState.IsValid)
             return BadRequest();
-        var order = await _ordersRepository.GetOrderById(id);
+        var order = await ordersRepository.GetOrderById(id);
         if (order is null)
             return NotFound();
         var response = new GetOrderResponse

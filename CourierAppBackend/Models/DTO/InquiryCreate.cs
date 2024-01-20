@@ -2,7 +2,7 @@ using CourierAppBackend.Models.Database;
 
 namespace CourierAppBackend.Models.DTO;
 
-public class InquiryC
+public class InquiryCreate
 {
     public string? UserId { get; set; }
     public DateTime PickupDate { get; set; }

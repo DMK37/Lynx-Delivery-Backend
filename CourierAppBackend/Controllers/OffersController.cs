@@ -31,7 +31,7 @@ namespace CourierAppBackend.Controllers
         [HttpPost(Name = "PostOffer")]
         public async Task<ActionResult<Offer>> CreateOffer([FromBody] OfferC createOffer)
         {
-            var offer = await _offersRepository.CreateNewOffer(createOffer);
+            var offer = await _offersRepository.CreateOffer(createOffer);
             if (offer is null)
                 return BadRequest();
             return CreatedAtRoute("PostOffer", new { ID = offer.Id }, offer);

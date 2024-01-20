@@ -10,12 +10,13 @@ public class DbAddressesRepository(CourierAppContext context)
 {
     public async Task<Address> AddAddress(AddressDTO addressDTO)
     {
-        var address = await context.Addresses.FirstOrDefaultAsync(x => 
-                                        x.City == addressDTO.City &&
-                                        x.PostalCode == addressDTO.PostalCode &&
-                                        x.Street == addressDTO.Street &&
-                                        x.HouseNumber == addressDTO.HouseNumber &&
-                                        x.ApartmentNumber == addressDTO.ApartmentNumber);
+        var address = await context.Addresses
+                                    .FirstOrDefaultAsync(x => 
+                                    x.City == addressDTO.City &&
+                                    x.PostalCode == addressDTO.PostalCode &&
+                                    x.Street == addressDTO.Street &&
+                                    x.HouseNumber == addressDTO.HouseNumber &&
+                                    x.ApartmentNumber == addressDTO.ApartmentNumber);
         if (address is not null)
             return address;
         Address newAddress = new()

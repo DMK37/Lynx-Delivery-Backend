@@ -7,7 +7,7 @@ namespace CourierAppBackend.Abstractions.Repositories
 {
     public interface IOffersRepository
     {
-        Task<Offer> CreateNewOffer(OfferC createOffer);
+        Task<Offer> CreateOffer(OfferC createOffer);
         Task<Offer> CreateOffferFromOurInquiry(OfferAll createOffers);
         Task<Offer> GetOfferById(int ID);
 
@@ -19,7 +19,7 @@ namespace CourierAppBackend.Abstractions.Repositories
 
         Task<List<OfferInfo>> GetOfferInfos(OfferAll createOffers, IEnumerable<IApiCommunicator> externalApis);
         // Create offer from request from other company
-        Task<CreateOfferResponse?> CreateOfferFromRequest(CreateOfferRequest request);
+        Task<CreateOfferResponse> CreateOffer(CreateOfferRequest request);
 
     }
 }

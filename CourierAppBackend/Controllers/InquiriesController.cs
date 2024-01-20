@@ -1,5 +1,4 @@
 ﻿using CourierAppBackend.Abstractions.Repositories;
-using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,45 +8,38 @@ namespace CourierAppBackend.Controllers;
 [ApiController]
 [ApiExplorerSettings(GroupName = "private")]
 [Route("api/inquiries")]
-public class InquiriesController : ControllerBase
+public class InquiriesController(IInquiriesRepository repository) 
+    : ControllerBase
 {
-    private readonly IInquiriesRepository _inquiriesRepository;
-
-    public InquiriesController(IInquiriesRepository repository)
-    {
-        _inquiriesRepository = repository;
-    }
-
     // GET: api/inquiries/{id}
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetInquiryById(int id)
+    [ProducesResponseType(typeof(InquiryDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    [HttpGet("{id}", Name = "GetInquiry")]
+    public async Task<ActionResult<InquiryDTO>> GetInquiryById([FromRoute] int id)
     {
-        var inquiry = await _inquiriesRepository.GetInquiryById(id);
-        if (inquiry is null)
-            return NotFound();
-        return Ok(inquiry);
+        var inquiry = await repository.GetInquiryById(id);
+        return inquiry is null ? NotFound() : Ok(inquiry);
     }
 
     // GET: api/inquiries
     [HttpGet]
+    [ProducesResponseType(typeof(List<InquiryDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [Authorize("read:all-inquiries")]
-    public async Task<IActionResult> GetAll()
+    public async Task<ActionResult<List<InquiryDTO>>> GetAll()
     {
-        var inquiries = await _inquiriesRepository.GetAll();
-        if (inquiries is null || inquiries.Count == 0)
-            return NotFound();
+        var inquiries = await repository.GetAll();
         return Ok(inquiries);
     }
 
     // POST: api/inquiries
-    [HttpPost(Name = "PostInquiry")]
-    [ProducesResponseType(typeof(Inquiry),StatusCodes.Status201Created)]
-    public async Task<ActionResult<Inquiry>> CreateInquiry([FromBody]InquiryC inquiry)
+    [HttpPost]
+    [ProducesResponseType(typeof(InquiryDTO), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<InquiryDTO>> CreateInquiry([FromBody] InquiryCreate inquiryCreate)
     {
-        var createdInquiry = await _inquiriesRepository.CreateInquiry(inquiry);
-        if (createdInquiry is null)
-            return BadRequest();
-        return CreatedAtRoute("PostInquiry", new { createdInquiry.Id }, createdInquiry);
+        var inquiry = await repository.CreateInquiry(inquiryCreate);
+        return CreatedAtRoute("GetInquiry", new { inquiry.Id }, inquiry);
     }
-
 }
