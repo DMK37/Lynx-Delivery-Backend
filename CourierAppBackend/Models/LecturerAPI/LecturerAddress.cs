@@ -1,6 +1,6 @@
 ﻿namespace CourierAppBackend.Models.LecturerAPI;
 
-public class Address
+public class LecturerAddress
 {
     public string HouseNumber { get; set; } = null!;
     public string ApartmentNumber { get; set; } = null!;

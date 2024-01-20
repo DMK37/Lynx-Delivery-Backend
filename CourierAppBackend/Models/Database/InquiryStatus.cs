@@ -3,5 +3,6 @@
 public enum InquiryStatus
 {
     Created,
-    Accepted
+    Accepted,
+    OffersRequested
 }

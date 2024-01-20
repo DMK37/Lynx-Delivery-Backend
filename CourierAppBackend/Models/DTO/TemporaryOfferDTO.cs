@@ -2,14 +2,12 @@
 
 namespace CourierAppBackend.Models.DTO
 {
-    public class OfferInfo
+    public class TemporaryOfferDTO
     {
         public int Id { get; set; }
-        public int? OfferId { get; set; }
-        public string Company { get; set; }
-        public string InquiryId { get; set; }
+        public string Company { get; set; } = null!;
         public decimal TotalPrice { get; set; }
         public DateTime ExpiringAt { get; set; }
-        public List<PriceBreakDownItem> PriceBreakDown { get; set; }
+        public List<PriceBreakDownItem> PriceBreakDown { get; set; } = null!;
     }
 }

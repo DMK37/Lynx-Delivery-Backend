@@ -8,4 +8,5 @@ public interface IInquiriesRepository
     Task<InquiryDTO?> GetInquiryById(int id);
     Task<List<InquiryDTO>> GetAll();
     Task<InquiryDTO> CreateInquiry(InquiryCreate inquiry);
+
 }

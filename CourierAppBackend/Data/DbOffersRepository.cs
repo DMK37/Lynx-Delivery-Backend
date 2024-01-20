@@ -1,64 +1,21 @@
 ﻿using CourierAppBackend.Abstractions.Repositories;
 using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
+using CourierAppBackend.Models.LecturerAPI;
 using CourierAppBackend.Models.LynxDeliveryAPI;
 using CourierAppBackend.Services;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace CourierAppBackend.Data
 {
-    public class DbOffersRepository(CourierAppContext context, IAddressesRepository addressesRepository,
-        IInquiriesRepository inquiriesRepository) : IOffersRepository
+    public class DbOffersRepository(CourierAppContext context, IAddressesRepository addressesRepository)
+        : IOffersRepository
     {
-        private readonly CourierAppContext _context = context;
-        private readonly IAddressesRepository _addressesRepository = addressesRepository;
-        private readonly IInquiriesRepository _inquiriesRepository = inquiriesRepository;
 
-        public async Task<Offer> CreateOffer(OfferC createOffer)
+        public async Task<Offer> CreateOffferFromOurInquiry(int id)
         {
-            var source = await _addressesRepository.AddAddress(createOffer.SourceAddress);
-            var destination = await _addressesRepository.AddAddress(createOffer.DestinationAddress);
-
-            Inquiry inquiry = new()
-            {
-                DateOfInquiring = DateTime.UtcNow,
-                PickupDate = createOffer.PickupDate,
-                DeliveryDate = createOffer.DeliveryDate,
-                Package = createOffer.Package,
-                SourceAddress = source,
-                DestinationAddress = destination,
-                IsCompany = createOffer.IsCompany,
-                HighPriority = createOffer.HighPriority,
-                DeliveryAtWeekend = createOffer.DeliveryAtWeekend,
-                Status = InquiryStatus.Created,
-                CourierCompanyName = "TODO"
-            };
-
-            await _context.Inquiries.AddAsync(inquiry);
-            await _context.SaveChangesAsync();
-
-            var calc = new PriceCalculator();
-            var price = calc.CalculatePrice(inquiry);
-
-            Offer offer = new()
-            {
-                Inquiry = inquiry,
-                CreationDate = DateTime.UtcNow,
-                ExpireDate = DateTime.UtcNow.AddMinutes(15),
-                UpdateDate = DateTime.UtcNow,
-                Status = OfferStatus.Offered,
-                Price = price
-            };
-
-            await _context.Offers.AddAsync(offer);
-            await _context.SaveChangesAsync();
-
-            return offer;
-        }
-
-        public async Task<Offer> CreateOffferFromOurInquiry(OfferAll createOffers)
-        {
-            var inquiry = await _context.Inquiries.FindAsync(createOffers.InquiryID);
+            var inquiry = await context.Inquiries.FindAsync(id);
             if (inquiry is null)
                 return null!;
 
@@ -76,15 +33,15 @@ namespace CourierAppBackend.Data
                 Price = price
             };
 
-            await _context.AddAsync(offer);
-            await _context.SaveChangesAsync();
+            await context.AddAsync(offer);
+            await context.SaveChangesAsync();
 
             return offer;
         }
 
         public async Task<Offer> GetOfferById(int ID)
         {
-            var result = await _context.Offers
+            var result = await context.Offers
                 .Include(x => x.Inquiry)
                 .Include(x => x.Inquiry.SourceAddress)
                 .Include(x => x.Inquiry.DestinationAddress)
@@ -94,7 +51,7 @@ namespace CourierAppBackend.Data
 
         public async Task<List<Offer>> GetOffers()
         {
-            var res = await _context.Offers
+            var res = await context.Offers
                 .Include(x => x.Inquiry)
                 .Include(x => x.Inquiry.SourceAddress)
                 .Include(x => x.Inquiry.DestinationAddress)
@@ -104,7 +61,7 @@ namespace CourierAppBackend.Data
 
         public async Task<List<Offer>> GetPendingOffers()
         {
-            var res = await _context.Offers.Where(x => x.Status == OfferStatus.Pending).Include(x => x.Inquiry)
+            var res = await context.Offers.Where(x => x.Status == OfferStatus.Pending).Include(x => x.Inquiry)
                 .Include(x => x.Inquiry.SourceAddress)
                 .Include(x => x.Inquiry.DestinationAddress)
                 .ToListAsync();
@@ -113,9 +70,9 @@ namespace CourierAppBackend.Data
 
         public async Task<Offer> SelectOffer(OfferSelect offerSelect)
         {
-            var address = await _addressesRepository.AddAddress(offerSelect.CustomerInfo.Address);
+            var address = await addressesRepository.AddAddress(offerSelect.CustomerInfo.Address);
 
-            var offer = _context.Offers.FirstOrDefault(x => x.Id == offerSelect.OfferId);
+            var offer = context.Offers.FirstOrDefault(x => x.Id == offerSelect.OfferId);
             if (offer == null)
                 return null!;
             offer.Status = OfferStatus.Pending;
@@ -129,16 +86,16 @@ namespace CourierAppBackend.Data
                 Email = offerSelect.CustomerInfo.Email,
             };
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             return offer;
         }
 
         public async Task<Offer> ConfirmOffer(int id, ConfirmOfferRequest request)
         {
-            var address = await _addressesRepository.AddAddress(request.CustomerInfo.Address);
+            var address = await addressesRepository.AddAddress(request.CustomerInfo.Address);
 
-            var offer = _context.Offers.FirstOrDefault(x => x.Id == id);
+            var offer = context.Offers.FirstOrDefault(x => x.Id == id);
             if (offer == null)
                 return null!;
             offer.Status = OfferStatus.Pending;
@@ -152,58 +109,88 @@ namespace CourierAppBackend.Data
                 Email = request.CustomerInfo.Email
             };
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             return offer;
         }
 
-        public async Task<List<OfferInfo>> GetOfferInfos(OfferAll createOffers, IEnumerable<IApiCommunicator> _externalApis)
+        public async Task<List<TemporaryOfferDTO>?> GetOffers(int inquiryId, List<IApiCommunicator> apis)
         {
-            var inquiry = await _context.Inquiries.Include(x => x.SourceAddress).Include(x => x.DestinationAddress).FirstOrDefaultAsync(x => x.Id == createOffers.InquiryID);
+            var inquiry = await context.Inquiries
+                                       .Include(x => x.SourceAddress)
+                                       .Include(x => x.Package)
+                                       .Include(x => x.DestinationAddress)
+                                       .FirstOrDefaultAsync(x => x.Id == inquiryId);
             if (inquiry is null)
-                return new List<OfferInfo>();
-            var externalApis = _externalApis.ToList();
-            var tasks = new Task<OfferInfo>[externalApis.Count];
-            for (int i = 0; i < tasks.Length; i++)
+                return null;
+            if (inquiry.Status == InquiryStatus.OffersRequested)
             {
-                tasks[i] = externalApis[i].GetOffer(inquiry);
+                return await context.TemporaryOffers
+                                    .AsNoTracking()
+                                    .Include(x => x.Inquiry)
+                                    .Include(x => x.PriceItems)
+                                    .Where(x => x.Inquiry.Id == inquiry.Id)
+                                    .Select(res => new TemporaryOfferDTO()
+                                    {
+                                        Id = res.Id,
+                                        Company = res.Company,
+                                        TotalPrice = res.TotalPrice,
+                                        ExpiringAt = res.ExpiringAt,
+                                        PriceBreakDown = res.PriceItems.Select(x => new PriceBreakDownItem()
+                                        {
+                                            Currency = x.Currency,
+                                            Amount = x.Amount,
+                                            Description = x.Description
+                                        }).ToList()
+                                    })
+                                    .ToListAsync();
+
             }
-
-            var offerInfos = new List<OfferInfo>();
-
-            Task<OfferInfo> timeoutTask = FakeTask();
-
-            while (tasks.Length > 0)
+            var tasks = new List<Task<TemporaryOffer>>();
+            for (int i = 0; i < apis.Count; i++)
+                tasks[i] = apis[i].GetOffer(inquiry);
+            var offers = new List<TemporaryOfferDTO>();
+            Task<TemporaryOffer> timeoutTask = FakeTask();
+            while (tasks.Count > 1)
             {
-                var completedTask = await Task.WhenAny(tasks.Concat(new[] { timeoutTask }));
-
+                var completedTask = await Task.WhenAny(tasks);
                 if (completedTask == timeoutTask)
-                {
-                    Console.WriteLine("Timeout reached. Not all requests completed.");
                     break;
-                }
-
-                tasks = tasks.Where(t => t != completedTask).ToArray();
-                OfferInfo res = await completedTask;
-
+                tasks.Remove(completedTask);
+                TemporaryOffer res = await completedTask;
                 if (res is not null)
                 {
-                    offerInfos.Add(res);
+                    await context.TemporaryOffers.AddAsync(res);
+                    await context.SaveChangesAsync();
+                    offers.Add(new TemporaryOfferDTO()
+                    {
+                        Id = res.Id,
+                        Company = res.Company,
+                        TotalPrice = res.TotalPrice,
+                        ExpiringAt = res.ExpiringAt,
+                        PriceBreakDown = res.PriceItems.Select(x => new PriceBreakDownItem()
+                        {
+                            Currency = x.Currency,
+                            Amount = x.Amount,
+                            Description = x.Description
+                        }).ToList()
+                    });
                 }
             }
-
-            return offerInfos;
+            inquiry.Status = InquiryStatus.OffersRequested;
+            await context.SaveChangesAsync();
+            return offers;
         }
 
-        public async Task<OfferInfo> FakeTask()
+        public async Task<TemporaryOffer> FakeTask()
         {
             await Task.Delay(30000);
             return null!;
         }
         public async Task<CreateOfferResponse> CreateOffer(CreateOfferRequest request)
         {
-            var source = await _addressesRepository.AddAddress(request.SourceAddress);
-            var destination = await _addressesRepository.AddAddress(request.DestinationAddress);
+            var source = await addressesRepository.AddAddress(request.SourceAddress);
+            var destination = await addressesRepository.AddAddress(request.DestinationAddress);
 
             Inquiry inquiry = new()
             {
@@ -220,8 +207,8 @@ namespace CourierAppBackend.Data
                 CourierCompanyName = "TODO"
             };
 
-            await _context.Inquiries.AddAsync(inquiry);
-            await _context.SaveChangesAsync();
+            await context.Inquiries.AddAsync(inquiry);
+            await context.SaveChangesAsync();
 
             var calc = new PriceCalculator();
             var price = calc.CalculatePrice(inquiry);
@@ -236,8 +223,8 @@ namespace CourierAppBackend.Data
                 Price = price
             };
 
-            await _context.Offers.AddAsync(offer);
-            await _context.SaveChangesAsync();
+            await context.Offers.AddAsync(offer);
+            await context.SaveChangesAsync();
 
             var response = new CreateOfferResponse
             {

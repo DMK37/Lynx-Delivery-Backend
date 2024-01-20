@@ -41,40 +41,12 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
         return accessToken;
     }
 
-    public async Task<OfferInfo> GetOffer(Inquiry inquiry)
+    public async Task<TemporaryOffer> GetOffer(Inquiry inquiry)
     {
-        CreateInquireRequest req = new()
-        {
-            Dimensions = new()
-            {
-                Width = inquiry.Package.Width,
-                Height = inquiry.Package.Height,
-                Length = inquiry.Package.Length,
-            },
-            Weight = inquiry.Package.Weight,
-            source = new()
-            {
-                HouseNumber = inquiry.SourceAddress.HouseNumber,
-                ApartmentNumber = inquiry.SourceAddress.ApartmentNumber,
-                City = inquiry.SourceAddress.City,
-                ZipCode = inquiry.SourceAddress.PostalCode
-            },
-            destination = new()
-            {
-                HouseNumber = inquiry.DestinationAddress.HouseNumber,
-                ApartmentNumber = inquiry.DestinationAddress.ApartmentNumber,
-                City = inquiry.DestinationAddress.City,
-                ZipCode = inquiry.DestinationAddress.PostalCode
-            },
-            PickupDate = inquiry.PickupDate,
-            DeliveryDay = inquiry.DeliveryDate,
-            deliveryInWeekend = inquiry.DeliveryAtWeekend,
-            Priority = inquiry.HighPriority ? "High" : "Low",
-            isComapny = inquiry.IsCompany
-        };
+        // TODO
+        CreateInquireRequest req = inquiry.ToRequest();
         var token = await GetToken();
         HttpClient client = new();
-
         var request = new HttpRequestMessage(HttpMethod.Post, _options.apiEndPoint + "/Inquires");
         request.Headers.Add("Authorization", $"Bearer {token}");
         string jsonBody = JsonConvert.SerializeObject(req);
@@ -82,16 +54,22 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
         var response = await client.SendAsync(request);
         if (response.StatusCode != HttpStatusCode.OK)
             return null!;
-
         string responseBody = await response.Content.ReadAsStringAsync();
         CreateInquireResponse apiResponse = JsonConvert.DeserializeObject<CreateInquireResponse>(responseBody)!;
-        return new OfferInfo()
+        return new TemporaryOffer()
         {
-            Company = "Lecturer",
-            InquiryId = apiResponse.InquiryId,
+            Inquiry = inquiry,
+            Company = "Lecturer Company",
+            InquiryID = apiResponse.InquiryId,
             TotalPrice = apiResponse.TotalPrice,
-            ExpiringAt = apiResponse.ExpiringAt,
-            PriceBreakDown = apiResponse.PriceBreakDown
+            ExpiringAt = apiResponse.ExpiringAt.ToUniversalTime(),
+            Currency = apiResponse.Currency,
+            PriceItems = apiResponse.PriceBreakDown.Select(x => new PriceItem()
+            {
+                Amount = x.Amount,
+                Description = x.Description,
+                Currency = x.Currency,
+            }).ToList()
         };
     }
 }

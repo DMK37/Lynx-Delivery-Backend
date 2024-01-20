@@ -1,5 +1,6 @@
 ﻿using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
+using CourierAppBackend.Models.LecturerAPI;
 using Elfie.Serialization;
 
 namespace CourierAppBackend.Services;
@@ -90,6 +91,38 @@ public static class TemporaryExtender
             DeliveryDate = inquiryCreate.DeliveryDate,
             UserId = inquiryCreate.UserId,
             CourierCompanyName = "Lynx Delivery"
+        };
+    }
+    public static CreateInquireRequest ToRequest(this Inquiry inquiry)
+    {
+        return new()
+        {
+            Dimensions = new()
+            {
+                Width = inquiry.Package.Width,
+                Height = inquiry.Package.Height,
+                Length = inquiry.Package.Length,
+            },
+            Weight = inquiry.Package.Weight,
+            source = new()
+            {
+                HouseNumber = inquiry.SourceAddress.HouseNumber,
+                ApartmentNumber = inquiry.SourceAddress.ApartmentNumber,
+                City = inquiry.SourceAddress.City,
+                ZipCode = inquiry.SourceAddress.PostalCode
+            },
+            destination = new()
+            {
+                HouseNumber = inquiry.DestinationAddress.HouseNumber,
+                ApartmentNumber = inquiry.DestinationAddress.ApartmentNumber,
+                City = inquiry.DestinationAddress.City,
+                ZipCode = inquiry.DestinationAddress.PostalCode
+            },
+            PickupDate = inquiry.PickupDate,
+            DeliveryDay = inquiry.DeliveryDate,
+            deliveryInWeekend = inquiry.DeliveryAtWeekend,
+            Priority = inquiry.HighPriority ? "High" : "Low",
+            isComapny = inquiry.IsCompany
         };
     }
 }

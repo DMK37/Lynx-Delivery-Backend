@@ -9,13 +9,13 @@ namespace CourierAppBackend.Controllers;
 [ApiController]
 [ApiExplorerSettings(GroupName = "private")]
 [Route("api/client")]
-public class ClientController(IInquiriesRepository repository, IUserRepository usersRepository)
+public class ClientController(IInquiriesRepository repository, IUserRepository usersRepository, IOffersRepository offersRepository)
     : ControllerBase
 {
     // POST: api/client/user-info
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [HttpPost("user-info")]
     [Authorize("edit:profile")]
     public async Task<ActionResult<UserDTO>> EditUser([FromBody] UserDTO userDTO)
@@ -27,9 +27,9 @@ public class ClientController(IInquiriesRepository repository, IUserRepository u
     }
 
     // GET: api/client/user-info
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpGet("user-info")]
     [Authorize("get:profile")]
     public async Task<ActionResult<UserDTO>> GetUserInfo()
@@ -40,8 +40,8 @@ public class ClientController(IInquiriesRepository repository, IUserRepository u
     }
 
     // GET: api/client/inquiries
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(List<InquiryDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [HttpGet("inquiries")]
     [Authorize("get:last-inquiries")]
     public async Task<ActionResult<List<InquiryDTO>>> GetLastInquiries()

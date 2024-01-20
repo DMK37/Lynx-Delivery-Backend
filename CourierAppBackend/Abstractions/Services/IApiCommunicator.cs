@@ -5,6 +5,6 @@ namespace CourierAppBackend.Services;
 
 public interface IApiCommunicator
 {
-    Task<OfferInfo> GetOffer(Inquiry inquiry);
+    Task<TemporaryOffer> GetOffer(Inquiry inquiry);
     Task<string> GetToken();
 }

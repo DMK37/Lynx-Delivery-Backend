@@ -12,21 +12,27 @@ public class LynxDeliveryAPI(IOffersRepository offersRepository)
         throw new NotImplementedException();
     }
 
-    public async Task<OfferInfo> GetOffer(Inquiry inquiry)
+    public async Task<TemporaryOffer> GetOffer(Inquiry inquiry)
     {
-        var offer = await offersRepository.CreateOffferFromOurInquiry(new() { InquiryID = inquiry.Id });
+        var offer = await offersRepository.CreateOffferFromOurInquiry(inquiry.Id);
         if (offer is null)
             return null!;
         PriceCalculator calc = new();
         var list = calc.CalculatePriceIntoBreakdown(inquiry);
-        return new OfferInfo()
+        return new TemporaryOffer()
         {
-            OfferId = offer.Id,
+            OfferID = offer.Id,
             Company = "Lynx Delivery",
-            InquiryId = offer.Inquiry.Id.ToString(),
+            Inquiry = inquiry,
             TotalPrice = list.Sum(x => x.Amount),
-            ExpiringAt = offer.ExpireDate,
-            PriceBreakDown = list
+            ExpiringAt = offer.ExpireDate.ToUniversalTime(),
+            Currency = "Pln",
+            PriceItems = list.Select(x => new PriceItem()
+            {
+                Amount = x.Amount,
+                Description = x.Description,
+                Currency = x.Currency,
+            }).ToList()
         };
     }
 }

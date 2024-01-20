@@ -15,19 +15,6 @@ public class OffersController(IOffersRepository offersRepository, IMessageSender
     : ControllerBase
 {
 
-    // endpoint to get offers from all couriers
-    // POST: api/offers/getAll
-    [HttpPost("getAll", Name = "PostOffers")]
-    public async Task<ActionResult<List<OfferInfo>>> CreateOffers([FromBody] OfferAll createOffers)
-    {
-
-        // TODO: create a way to manage different API's
-        var offers = await offersRepository.GetOfferInfos(createOffers, apis);
-        if (offers is null)
-            return BadRequest();
-        return Ok(offers);
-    }
-
     // endpoint to accept offer providing customer info
     [HttpPost("{id}/select")]
     public async Task<ActionResult<Offer>> SelectOffer([FromBody] OfferSelect createOffers)

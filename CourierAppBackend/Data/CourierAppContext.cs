@@ -9,4 +9,6 @@ public class CourierAppContext(DbContextOptions options) : DbContext(options)
     public DbSet<Offer> Offers { get; set; }
     public DbSet<Address> Addresses { get; set; }
     public DbSet<Order> Orders { get; set; }
+    public DbSet<TemporaryOffer> TemporaryOffers { get; set; }
+    public DbSet<PriceItem> PriceItems { get; set; }
 }

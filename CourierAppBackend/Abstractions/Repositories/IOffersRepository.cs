@@ -7,8 +7,7 @@ namespace CourierAppBackend.Abstractions.Repositories;
 
 public interface IOffersRepository
 {
-    Task<Offer> CreateOffer(OfferC createOffer);
-    Task<Offer> CreateOffferFromOurInquiry(OfferAll createOffers);
+    Task<Offer> CreateOffferFromOurInquiry(int id);
     Task<Offer> GetOfferById(int ID);
 
     Task<List<Offer>> GetOffers();
@@ -17,7 +16,7 @@ public interface IOffersRepository
     Task<Offer> SelectOffer(OfferSelect offerSelect);
     Task<Offer> ConfirmOffer(int id, ConfirmOfferRequest request);
 
-    Task<List<OfferInfo>> GetOfferInfos(OfferAll createOffers, IEnumerable<IApiCommunicator> externalApis);
+    Task<List<TemporaryOfferDTO>?> GetOffers(int inquiryId, List<IApiCommunicator> apis);
     // Create offer from request from other company
     Task<CreateOfferResponse> CreateOffer(CreateOfferRequest request);
 

@@ -22,7 +22,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
         builder =>
         {
-            builder.WithOrigins(origin, deployOrigin
+            builder.WithOrigins(origin!, deployOrigin!
                ).AllowAnyMethod().AllowAnyHeader();
         });
 });
@@ -107,7 +107,7 @@ builder.Services.AddScoped<IOrdersRepository, DbOrdersRepository>();
 
 builder.Services.AddScoped<IApiCommunicator, LecturerAPI>();
 builder.Services.AddScoped<IApiCommunicator, LynxDeliveryAPI>();
-builder.Services.AddScoped<IApiCommunicator, FakeApi>();
+//builder.Services.AddScoped<IApiCommunicator, FakeApi>();
 
 builder.Services.AddDbContext<CourierAppContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("MainDatabase")));

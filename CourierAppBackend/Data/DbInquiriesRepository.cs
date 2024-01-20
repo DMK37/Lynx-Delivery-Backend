@@ -10,17 +10,16 @@ public class DbInquiriesRepository(CourierAppContext context, IAddressesReposito
 {
     public async Task<List<InquiryDTO>> GetLastInquiries(string userId)
     {
-        var inquiries = await context.Inquiries
-                                     .AsNoTracking()
-                                     .Where(x => x.UserId == userId &&
-                                     (DateTime.UtcNow - x.DateOfInquiring).Days < 30)
-                                     .Include(x => x.SourceAddress)
-                                     .Include(x => x.DestinationAddress)
-                                     .Include(x => x.Package)
-                                     // TODO
-                                     .Select(x => x.ToDto())
-                                     .ToListAsync();
-        return inquiries;
+        return await context.Inquiries
+                            .AsNoTracking()
+                            .Where(x => x.UserId == userId &&
+                            (DateTime.UtcNow - x.DateOfInquiring).Days < 30)
+                            .Include(x => x.SourceAddress)
+                            .Include(x => x.DestinationAddress)
+                            .Include(x => x.Package)
+                            // TODO
+                            .Select(x => x.ToDto())
+                            .ToListAsync();
     }
 
     public async Task<List<InquiryDTO>> GetAll()

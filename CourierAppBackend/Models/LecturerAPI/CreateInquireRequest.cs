@@ -6,8 +6,8 @@ public class CreateInquireRequest
     public string Currency { get; set; } = "Pln";
     public float Weight { get; set; }
     public string WeightUnit { get; set; } = "Kilograms";
-    public Address source { get; set; } = null!;
-    public Address destination { get; set; } = null!;
+    public LecturerAddress source { get; set; } = null!;
+    public LecturerAddress destination { get; set; } = null!;
     public DateTime PickupDate { get; set; }
     public DateTime DeliveryDay { get; set; }
     public bool deliveryInWeekend { get; set; }
