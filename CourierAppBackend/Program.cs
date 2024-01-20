@@ -17,10 +17,11 @@ var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
 {
     var origin = builder.Configuration["Auth0:CLIENT_ORIGIN_URL"];
+    var deployOrigin = builder.Configuration["Auth0:DEPLOY_ORIGIN_URL"];
     options.AddPolicy(name: MyAllowSpecificOrigins,
         builder =>
         {
-            builder.WithOrigins(origin
+            builder.WithOrigins(origin, deployOrigin
                ).AllowAnyMethod().AllowAnyHeader();
         });
 });
@@ -65,6 +66,8 @@ builder.Services.AddScoped<ApiKeyAuthFilter>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
