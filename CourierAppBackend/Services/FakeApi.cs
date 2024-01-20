@@ -1,9 +1,9 @@
-﻿using CourierAppBackend.Models;
-using CourierAppBackend.ModelsDTO;
+﻿using CourierAppBackend.Models.Database;
+using CourierAppBackend.Models.DTO;
 
 namespace CourierAppBackend.Services
 {
-    public class FakeApi : IExternalApi
+    public class FakeApi : IApiCommunicator
     {
         public async Task<OfferInfo> GetOffer(Inquiry inquiry)
         {

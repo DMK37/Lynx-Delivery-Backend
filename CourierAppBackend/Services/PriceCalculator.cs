@@ -1,5 +1,5 @@
-﻿using CourierAppBackend.Models;
-using CourierAppBackend.ModelsLecturerApi;
+﻿using CourierAppBackend.Models.Database;
+using CourierAppBackend.Models.LecturerAPI;
 
 namespace CourierAppBackend.Services;
 

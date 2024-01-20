@@ -1,6 +1,7 @@
-﻿using CourierAppBackend.Abstractions;
-using CourierAppBackend.Models;
-using CourierAppBackend.ModelsDTO;
+﻿using CourierAppBackend.Abstractions.Repositories;
+using CourierAppBackend.Abstractions.Services;
+using CourierAppBackend.Models.Database;
+using CourierAppBackend.Models.DTO;
 using CourierAppBackend.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,8 +17,8 @@ namespace CourierAppBackend.Controllers
         private IOrdersRepository _ordersRepository;
         private IInquiriesRepository _inquiriesRepository;
         private IMessageSender _messageSender;
-        private IExternalApi _contactLecturerApi;
-        public OrdersController(IOrdersRepository ordersRepository, IMessageSender messageSender, IExternalApi api, IInquiriesRepository inquiriesRepository)
+        private IApiCommunicator _contactLecturerApi;
+        public OrdersController(IOrdersRepository ordersRepository, IMessageSender messageSender, IApiCommunicator api, IInquiriesRepository inquiriesRepository)
         {
             _ordersRepository = ordersRepository;
             _messageSender = messageSender;

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using CourierAppBackend.Models;
+using CourierAppBackend.Models.Database;
 namespace CourierAppBackend.Data;
 
 public class CourierAppContext : DbContext

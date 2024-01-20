@@ -1,8 +1,7 @@
-﻿using CourierAppBackend.Abstractions;
-using CourierAppBackend.DtoModels;
-using CourierAppBackend.Models;
-using CourierAppBackend.ModelsDTO;
-using CourierAppBackend.ModelsPublicDTO;
+﻿using CourierAppBackend.Abstractions.Repositories;
+using CourierAppBackend.Models.Database;
+using CourierAppBackend.Models.DTO;
+using CourierAppBackend.Models.LynxDeliveryAPI;
 using CourierAppBackend.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -215,7 +214,7 @@ namespace CourierAppBackend.Data
             return offer;
         }
 
-        public async Task<List<OfferInfo>> GetOfferInfos(OfferAll createOffers, IEnumerable<IExternalApi> _externalApis)
+        public async Task<List<OfferInfo>> GetOfferInfos(OfferAll createOffers, IEnumerable<IApiCommunicator> _externalApis)
         {
             var inquiry = await _context.Inquiries.Include(x => x.SourceAddress).Include(x => x.DestinationAddress).FirstOrDefaultAsync(x => x.Id == createOffers.InquiryID);
             if (inquiry is null)

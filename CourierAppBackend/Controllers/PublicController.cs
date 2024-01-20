@@ -1,9 +1,8 @@
-﻿using CourierAppBackend.Abstractions;
+﻿using CourierAppBackend.Abstractions.Repositories;
+using CourierAppBackend.Abstractions.Services;
 using CourierAppBackend.Auth;
-using CourierAppBackend.DtoModels;
-using CourierAppBackend.Models;
-using CourierAppBackend.ModelsDTO;
-using CourierAppBackend.ModelsPublicDTO;
+using CourierAppBackend.Models.Database;
+using CourierAppBackend.Models.LynxDeliveryAPI;
 using CourierAppBackend.Services;
 using Microsoft.AspNetCore.Mvc;
 

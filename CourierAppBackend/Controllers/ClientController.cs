@@ -1,5 +1,5 @@
-using CourierAppBackend.Abstractions;
-using CourierAppBackend.Models;
+using CourierAppBackend.Abstractions.Repositories;
+using CourierAppBackend.Models.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

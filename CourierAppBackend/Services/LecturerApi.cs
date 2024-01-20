@@ -1,6 +1,6 @@
-﻿using CourierAppBackend.Models;
-using CourierAppBackend.ModelsDTO;
-using CourierAppBackend.ModelsLecturerApi;
+﻿using CourierAppBackend.Models.Database;
+using CourierAppBackend.Models.DTO;
+using CourierAppBackend.Models.LecturerAPI;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -13,10 +13,10 @@ using System.Text.Json.Nodes;
 
 namespace CourierAppBackend.Services
 {
-    public class LecturerApi : IExternalApi
+    public class LecturerAPI : IApiCommunicator
     {
         private readonly ExternalApisOptions _options;
-        public LecturerApi(IOptions<ExternalApisOptions> options)
+        public LecturerAPI(IOptions<ExternalApisOptions> options)
         {
             _options = options.Value;
         }

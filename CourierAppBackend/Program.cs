@@ -1,5 +1,6 @@
 using CourierAppBackend;
-using CourierAppBackend.Abstractions;
+using CourierAppBackend.Abstractions.Repositories;
+using CourierAppBackend.Abstractions.Services;
 using CourierAppBackend.Auth;
 using CourierAppBackend.Data;
 using CourierAppBackend.Services;
@@ -104,9 +105,9 @@ builder.Services.AddScoped<IUserInfoRepository, DbUserInfoRepository>();
 builder.Services.AddScoped<IOffersRepository, DbOffersRepository>();
 builder.Services.AddScoped<IOrdersRepository, DbOrdersRepository>();
 
-builder.Services.AddScoped<IExternalApi, LecturerApi>();
-builder.Services.AddScoped<IExternalApi, OurApi>();
-builder.Services.AddScoped<IExternalApi, FakeApi>();
+builder.Services.AddScoped<IApiCommunicator, LecturerAPI>();
+builder.Services.AddScoped<IApiCommunicator, LynxDeliveryAPI>();
+builder.Services.AddScoped<IApiCommunicator, FakeApi>();
 
 builder.Services.AddDbContext<CourierAppContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("MainDatabase")));

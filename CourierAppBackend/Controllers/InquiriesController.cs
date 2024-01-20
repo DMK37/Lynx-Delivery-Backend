@@ -1,6 +1,6 @@
-﻿using CourierAppBackend.Abstractions;
-using CourierAppBackend.DtoModels;
-using CourierAppBackend.Models;
+﻿using CourierAppBackend.Abstractions.Repositories;
+using CourierAppBackend.Models.Database;
+using CourierAppBackend.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

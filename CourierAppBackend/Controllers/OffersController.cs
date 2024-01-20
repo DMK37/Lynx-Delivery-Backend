@@ -1,8 +1,8 @@
-﻿using CourierAppBackend.Abstractions;
+﻿using CourierAppBackend.Abstractions.Repositories;
+using CourierAppBackend.Abstractions.Services;
 using CourierAppBackend.Data;
-using CourierAppBackend.DtoModels;
-using CourierAppBackend.Models;
-using CourierAppBackend.ModelsDTO;
+using CourierAppBackend.Models.Database;
+using CourierAppBackend.Models.DTO;
 using CourierAppBackend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,9 +17,9 @@ namespace CourierAppBackend.Controllers
     {
         private readonly IOffersRepository _offersRepository;
         private readonly IMessageSender _messageSender;
-        private readonly IEnumerable<IExternalApi> _externalApis;
+        private readonly IEnumerable<IApiCommunicator> _externalApis;
 
-        public OffersController(IOffersRepository offersRepository, IMessageSender messageSender, IEnumerable<IExternalApi> externalApis)
+        public OffersController(IOffersRepository offersRepository, IMessageSender messageSender, IEnumerable<IApiCommunicator> externalApis)
         {
             _offersRepository = offersRepository;
             _messageSender = messageSender;
