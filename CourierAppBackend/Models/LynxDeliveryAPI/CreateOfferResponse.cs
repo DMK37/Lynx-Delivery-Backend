@@ -1,4 +1,4 @@
-﻿using CourierAppBackend.Models.LecturerAPI;
+﻿using CourierAppBackend.Models.DTO;
 
 namespace CourierAppBackend.Models.LynxDeliveryAPI;
 public class CreateOfferResponse
@@ -6,5 +6,5 @@ public class CreateOfferResponse
     public int OfferId { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime ExpireDate { get; set; }
-    public List<PriceBreakDownItem> Price { get; set; } = null!;
+    public List<PriceItemDTO> Price { get; set; } = null!;
 }

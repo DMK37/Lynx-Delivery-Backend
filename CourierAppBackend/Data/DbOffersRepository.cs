@@ -1,11 +1,9 @@
 ﻿using CourierAppBackend.Abstractions.Repositories;
 using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
-using CourierAppBackend.Models.LecturerAPI;
 using CourierAppBackend.Models.LynxDeliveryAPI;
 using CourierAppBackend.Services;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace CourierAppBackend.Data
 {
@@ -68,11 +66,13 @@ namespace CourierAppBackend.Data
             return res;
         }
 
-        public async Task<Offer> SelectOffer(OfferSelect offerSelect)
+        public async Task<Offer> SelectOffers(OfferSelect offerSelect)
         {
             var address = await addressesRepository.AddAddress(offerSelect.CustomerInfo.Address);
 
-            var offer = await context.Offers.FirstOrDefaultAsync(x => x.Id == offerSelect.OfferId);
+            var offer = await context.Offers
+                                     .Include(x => x.Inquiry)    
+                                     .FirstOrDefaultAsync(x => x.Id == offerSelect.OfferId);
             if (offer == null)
                 return null!;
             offer.Status = OfferStatus.Pending;
@@ -85,6 +85,7 @@ namespace CourierAppBackend.Data
                 Address = address,
                 Email = offerSelect.CustomerInfo.Email,
             };
+            offer.Inquiry.OfferID = offer.Id;
 
             await context.SaveChangesAsync();
 
@@ -136,7 +137,7 @@ namespace CourierAppBackend.Data
                                         Company = res.Company,
                                         TotalPrice = res.TotalPrice,
                                         ExpiringAt = res.ExpiringAt,
-                                        PriceBreakDown = res.PriceItems.Select(x => new PriceBreakDownItem()
+                                        PriceBreakDown = res.PriceItems.Select(x => new PriceItemDTO()
                                         {
                                             Currency = x.Currency,
                                             Amount = x.Amount,
@@ -171,7 +172,7 @@ namespace CourierAppBackend.Data
                         Company = res.Company,
                         TotalPrice = res.TotalPrice,
                         ExpiringAt = res.ExpiringAt,
-                        PriceBreakDown = res.PriceItems.Select(x => new PriceBreakDownItem()
+                        PriceBreakDown = res.PriceItems.Select(x => new PriceItemDTO()
                         {
                             Currency = x.Currency,
                             Amount = x.Amount,
@@ -238,6 +239,27 @@ namespace CourierAppBackend.Data
             };
 
             return response;
+        }
+
+        public async Task<bool> SelectOffer(int id, CustomerInfoDTO customerInfoDTO, List<IApiCommunicator> apis)
+        {
+            var tempOffer = await context.TemporaryOffers
+                                         .Include(x => x.Inquiry)
+                                         .FirstOrDefaultAsync(x => x.Id == id);
+            if (tempOffer is null)
+                return false;
+            var api = apis.Find(x => x.Company == tempOffer.Company);
+            if (api is null)
+                return false;
+            var offer = await api.SelectOffer(tempOffer, customerInfoDTO);
+            if(offer is not null)
+            {
+                tempOffer.Inquiry.Status = InquiryStatus.Accepted;
+                tempOffer.Inquiry.DeliveringCompany = tempOffer.Company;
+                await context.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
     }
 

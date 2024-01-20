@@ -14,16 +14,14 @@ namespace CourierAppBackend.Controllers;
 public class OffersController(IOffersRepository offersRepository, IMessageSender messageSender, IEnumerable<IApiCommunicator> apis) 
     : ControllerBase
 {
-
-    // endpoint to accept offer providing customer info
+    // POST: api/offers/{id}/select
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
     [HttpPost("{id}/select")]
-    public async Task<ActionResult<Offer>> SelectOffer([FromBody] OfferSelect createOffers)
+    public async Task<IActionResult> SelectOffer([FromRoute] int id, [FromBody] CustomerInfoDTO customerInfoDTO)
     {
-        var offer = await offersRepository.SelectOffer(createOffers);
-        if (offer is null)
-            return BadRequest();
-        await messageSender.SendOfferSelectedMessage(offer);
-        return CreatedAtRoute("PostOffers", new { ID = offer.Id }, offer);
+        var offer = await offersRepository.SelectOffer(id, customerInfoDTO, apis.ToList());
+        return offer ? Ok() : BadRequest();
     }
 
     // GET: api/offers/{id}
@@ -36,6 +34,8 @@ public class OffersController(IOffersRepository offersRepository, IMessageSender
         return Ok(offer);
     }
 
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
     [HttpGet]
     [Authorize("read:all-offers")]
     public async Task<ActionResult<List<Offer>>> GetOffers()

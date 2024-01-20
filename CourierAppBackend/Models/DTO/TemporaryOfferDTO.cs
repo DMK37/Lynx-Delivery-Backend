@@ -1,6 +1,4 @@
-﻿using CourierAppBackend.Models.LecturerAPI;
-
-namespace CourierAppBackend.Models.DTO
+﻿namespace CourierAppBackend.Models.DTO
 {
     public class TemporaryOfferDTO
     {
@@ -8,6 +6,6 @@ namespace CourierAppBackend.Models.DTO
         public string Company { get; set; } = null!;
         public decimal TotalPrice { get; set; }
         public DateTime ExpiringAt { get; set; }
-        public List<PriceBreakDownItem> PriceBreakDown { get; set; } = null!;
+        public List<PriceItemDTO> PriceBreakDown { get; set; } = null!;
     }
 }

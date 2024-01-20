@@ -1,4 +1,6 @@
-﻿namespace CourierAppBackend.Models.LecturerAPI;
+﻿using CourierAppBackend.Models.DTO;
+
+namespace CourierAppBackend.Models.LecturerAPI;
 
 public class CreateInquireResponse
 {
@@ -6,5 +8,5 @@ public class CreateInquireResponse
     public decimal TotalPrice { get; set; }
     public string Currency { get; set; } = null!;
     public DateTime ExpiringAt { get; set; }
-    public List<PriceBreakDownItem> PriceBreakDown { get; set; } = null!;
+    public List<PriceItemDTO> PriceBreakDown { get; set; } = null!;
 }

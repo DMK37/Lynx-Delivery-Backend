@@ -1,6 +1,6 @@
-﻿namespace CourierAppBackend.Models.LecturerAPI;
+﻿namespace CourierAppBackend.Models.DTO;
 
-public class PriceBreakDownItem
+public class PriceItemDTO
 {
     public decimal Amount { get; set; }
     public string Currency { get; set; } = null!;

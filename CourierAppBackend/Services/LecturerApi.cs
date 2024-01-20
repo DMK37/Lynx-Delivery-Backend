@@ -17,19 +17,20 @@ namespace CourierAppBackend.Services;
 public class LecturerAPI(IOptions<LecturerAPIOptions> options) 
     : IApiCommunicator
 {
-    private readonly LecturerAPIOptions _options = options.Value;
+    private readonly LecturerAPIOptions options = options.Value;
+    public string Company => "Lecturer Company";
 
     public async Task<string> GetToken()
     {
         HttpClient client = new();
-        var request = new HttpRequestMessage(HttpMethod.Post, _options.tokenEndPoint)
+        var request = new HttpRequestMessage(HttpMethod.Post, options.tokenEndPoint)
         {
             Content = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("grant_type", "client_credentials"),
-                new KeyValuePair<string, string>("scope", _options.Scope),
-                new KeyValuePair<string, string>("client_id", _options.client_id),
-                new KeyValuePair<string, string>("client_secret", _options.client_secret)
+                new KeyValuePair<string, string>("scope", options.Scope),
+                new KeyValuePair<string, string>("client_id", options.client_id),
+                new KeyValuePair<string, string>("client_secret", options.client_secret)
             })
         };
         var response = await client.SendAsync(request);
@@ -47,7 +48,7 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
         CreateInquireRequest req = inquiry.ToRequest();
         var token = await GetToken();
         HttpClient client = new();
-        var request = new HttpRequestMessage(HttpMethod.Post, _options.apiEndPoint + "/Inquires");
+        var request = new HttpRequestMessage(HttpMethod.Post, options.apiEndPoint + "/Inquires");
         request.Headers.Add("Authorization", $"Bearer {token}");
         string jsonBody = JsonConvert.SerializeObject(req);
         request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
@@ -71,5 +72,35 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
                 Currency = x.Currency,
             }).ToList()
         };
+    }
+
+    public async Task<TemporaryOffer?> SelectOffer(TemporaryOffer offer, CustomerInfoDTO customerInfoDTO)
+    {
+        // TODO
+        CreateOfferRequest req = new()
+        {
+            InquiryId = offer.InquiryID,
+            Name = $"{customerInfoDTO.FirstName} {customerInfoDTO.LastName}",
+            Email = customerInfoDTO.Email,
+            Address = new()
+            {
+                HouseNumber = customerInfoDTO.Address.HouseNumber,
+                ApartmentNumber = customerInfoDTO.Address.ApartmentNumber,
+                City = customerInfoDTO.Address.City,
+                ZipCode = customerInfoDTO.Address.PostalCode
+            }
+        };
+        var token = await GetToken();
+        HttpClient client = new();
+        var request = new HttpRequestMessage(HttpMethod.Post, options.apiEndPoint + "/Offers");
+        request.Headers.Add("Authorization", $"Bearer {token}");
+        string jsonBody = JsonConvert.SerializeObject(req);
+        request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+        var response = await client.SendAsync(request);
+        if (response.StatusCode != HttpStatusCode.OK)
+            return null;
+        string responseBody = await response.Content.ReadAsStringAsync();
+        CreateOfferResponse apiResponse = JsonConvert.DeserializeObject<CreateOfferResponse>(responseBody)!;
+        return offer;
     }
 }

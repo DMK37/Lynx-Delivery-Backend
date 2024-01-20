@@ -12,6 +12,7 @@ public class Inquiry : Base
     public bool HighPriority { get; set; }
     public bool DeliveryAtWeekend { get; set; }
     public InquiryStatus Status { get; set; }
+    public string? DeliveringCompany { get; set; }
     public int? OfferID { get; set; }
     public string? CourierCompanyName { get; set; }
 }

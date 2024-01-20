@@ -13,11 +13,13 @@ public interface IOffersRepository
     Task<List<Offer>> GetOffers();
 
     Task<List<Offer>> GetPendingOffers();
-    Task<Offer> SelectOffer(OfferSelect offerSelect);
+    Task<Offer> SelectOffers(OfferSelect offerSelect);
     Task<Offer> ConfirmOffer(int id, ConfirmOfferRequest request);
 
     Task<List<TemporaryOfferDTO>?> GetOffers(int inquiryId, List<IApiCommunicator> apis);
+    Task<bool> SelectOffer(int id, CustomerInfoDTO customerInfoDTO, List<IApiCommunicator> apis);
     // Create offer from request from other company
     Task<CreateOfferResponse> CreateOffer(CreateOfferRequest request);
+
 
 }
