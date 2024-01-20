@@ -72,7 +72,7 @@ namespace CourierAppBackend.Data
         {
             var address = await addressesRepository.AddAddress(offerSelect.CustomerInfo.Address);
 
-            var offer = context.Offers.FirstOrDefault(x => x.Id == offerSelect.OfferId);
+            var offer = await context.Offers.FirstOrDefaultAsync(x => x.Id == offerSelect.OfferId);
             if (offer == null)
                 return null!;
             offer.Status = OfferStatus.Pending;
@@ -95,7 +95,7 @@ namespace CourierAppBackend.Data
         {
             var address = await addressesRepository.AddAddress(request.CustomerInfo.Address);
 
-            var offer = context.Offers.FirstOrDefault(x => x.Id == id);
+            var offer = await context.Offers.FirstOrDefaultAsync(x => x.Id == id);
             if (offer == null)
                 return null!;
             offer.Status = OfferStatus.Pending;
@@ -147,10 +147,13 @@ namespace CourierAppBackend.Data
 
             }
             var tasks = new List<Task<TemporaryOffer>>();
-            for (int i = 0; i < apis.Count; i++)
-                tasks[i] = apis[i].GetOffer(inquiry);
             var offers = new List<TemporaryOfferDTO>();
+
+            foreach (var api in apis)
+                tasks.Add(api.GetOffer(inquiry));
+
             Task<TemporaryOffer> timeoutTask = FakeTask();
+            tasks.Add(timeoutTask);
             while (tasks.Count > 1)
             {
                 var completedTask = await Task.WhenAny(tasks);

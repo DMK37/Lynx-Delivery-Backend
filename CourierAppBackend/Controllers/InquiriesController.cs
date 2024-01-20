@@ -1,5 +1,4 @@
 ﻿using CourierAppBackend.Abstractions.Repositories;
-using CourierAppBackend.Data;
 using CourierAppBackend.Models.DTO;
 using CourierAppBackend.Services;
 using Microsoft.AspNetCore.Authorization;
