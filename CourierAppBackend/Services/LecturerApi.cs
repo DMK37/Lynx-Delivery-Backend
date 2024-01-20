@@ -44,7 +44,7 @@ namespace CourierAppBackend.Services
 
         public async Task<OfferInfo> GetOffer(Inquiry inquiry)
         {
-            LecturerCreateInquireRequest req = new()
+            CreateInquireRequest req = new()
             {
                 Dimensions = new()
                 {

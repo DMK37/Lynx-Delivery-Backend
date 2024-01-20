@@ -1,12 +1,10 @@
-﻿namespace CourierAppBackend.Models.LecturerAPI
-{
-    public class Address
-    {
-        public string HouseNumber { get; set; }
-        public string ApartmentNumber { get; set; }
-        public string City { get; set; }
-        public string ZipCode { get; set; }
-        public string Country { get; set; } = "Polska";
+﻿namespace CourierAppBackend.Models.LecturerAPI;
 
-    }
+public class Address
+{
+    public string HouseNumber { get; set; } = null!;
+    public string ApartmentNumber { get; set; } = null!;
+    public string City { get; set; } = null!;
+    public string ZipCode { get; set; } = null!;
+    public string Country { get; set; } = "Polska";
 }

@@ -1,11 +1,4 @@
 ﻿namespace CourierAppBackend.Models.Database;
-public enum OrderStatus
-{
-    Accepted,
-    PickedUp,
-    CannotDeliver,
-    Delivered
-}
 public class Order : Base
 {
     public int OfferID { get; set; }

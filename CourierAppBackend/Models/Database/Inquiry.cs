@@ -1,10 +1,4 @@
 ﻿namespace CourierAppBackend.Models.Database;
-
-public enum InquiryStatus
-{
-    Created,
-    Accepted
-}
 public class Inquiry : Base
 {
     public string? UserId { get; set; }

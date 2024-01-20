@@ -1,13 +1,5 @@
 ﻿namespace CourierAppBackend.Models.Database;
 
-public enum OfferStatus
-{
-    Offered,
-    Pending,
-    Accepted,
-    Rejected
-}
-
 public class Offer : Base
 {
     public Inquiry Inquiry { get; set; } = null!;

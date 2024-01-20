@@ -3,7 +3,6 @@ using CourierAppBackend.Abstractions.Services;
 using CourierAppBackend.Auth;
 using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.LynxDeliveryAPI;
-using CourierAppBackend.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourierAppBackend.Controllers;
@@ -18,7 +17,7 @@ public class PublicController : ControllerBase
     private readonly IOffersRepository _offersRepository;
     private readonly IOrdersRepository _ordersRepository;
     private readonly IMessageSender _messageSender;
-    public PublicController(IOffersRepository offersRepository,IOrdersRepository ordersRepository, IMessageSender messageSender)
+    public PublicController(IOffersRepository offersRepository, IOrdersRepository ordersRepository, IMessageSender messageSender)
     {
         _offersRepository = offersRepository;
         _ordersRepository = ordersRepository;
@@ -27,10 +26,11 @@ public class PublicController : ControllerBase
 
     // POST: api/public/offers
     [HttpPost("offers")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<CreateOfferResponse>> CreateOffer([FromBody] CreateOfferRequest request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest();
         var offer = await _offersRepository.CreateOfferFromRequest(request);
         if (offer is null)
             return BadRequest();
@@ -45,11 +45,11 @@ public class PublicController : ControllerBase
     }
 
     [HttpPatch("offers/{id}/confirm")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<Offer>> ConfirmOffer([FromRoute] int id, [FromBody] ConfirmOfferRequest request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest();
-
         var offer = await _offersRepository.ConfirmOffer(id, request);
         if (offer is null)
             return BadRequest();
@@ -61,8 +61,6 @@ public class PublicController : ControllerBase
     [HttpGet("offers/{id}", Name = "GetOffer")]
     public async Task<ActionResult<GetOfferResponse>> GetOffer(int id)
     {
-        if (!ModelState.IsValid)
-            return BadRequest();
         var offer = await _offersRepository.GetOfferById(id);
         if (offer is null)
             return NotFound();

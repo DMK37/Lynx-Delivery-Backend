@@ -15,7 +15,8 @@ namespace CourierAppBackend.Abstractions.Repositories
 
         Task<List<Offer>> GetPendingOffers();
 
-        Task<Offer> CreateOfferFromRequest(CreateOfferRequest request);
+        // Create offer from request from other company
+        Task<Offer?> CreateOfferFromRequest(CreateOfferRequest request);
         Task<Offer> SelectOffer(OfferSelect offerSelect);
         Task<Offer> ConfirmOffer(int id, ConfirmOfferRequest request);
 
