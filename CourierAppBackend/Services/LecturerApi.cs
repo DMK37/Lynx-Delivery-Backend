@@ -1,4 +1,5 @@
-﻿using CourierAppBackend.Models.Database;
+﻿using CourierAppBackend.Configuration;
+using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
 using CourierAppBackend.Models.LecturerAPI;
 using Microsoft.Extensions.Options;
@@ -15,8 +16,8 @@ namespace CourierAppBackend.Services
 {
     public class LecturerAPI : IApiCommunicator
     {
-        private readonly ExternalApisOptions _options;
-        public LecturerAPI(IOptions<ExternalApisOptions> options)
+        private readonly LecturerAPIOptions _options;
+        public LecturerAPI(IOptions<LecturerAPIOptions> options)
         {
             _options = options.Value;
         }

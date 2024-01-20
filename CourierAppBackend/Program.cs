@@ -1,7 +1,7 @@
-using CourierAppBackend;
 using CourierAppBackend.Abstractions.Repositories;
 using CourierAppBackend.Abstractions.Services;
 using CourierAppBackend.Auth;
+using CourierAppBackend.Configuration;
 using CourierAppBackend.Data;
 using CourierAppBackend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -112,13 +112,12 @@ builder.Services.AddScoped<IApiCommunicator, FakeApi>();
 builder.Services.AddDbContext<CourierAppContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("MainDatabase")));
 
-builder.Services.AddSendGrid(options =>
-            options.ApiKey = builder.Configuration["SENDGRID_API_KEY"]
-        );
+builder.Services.AddSendGrid(
+    options => options.ApiKey = builder.Configuration["SendGrid:SENDGRID_API_KEY"]);
 builder.Services.AddScoped<IMessageSender, EmailSender>();
 
 
-builder.Services.Configure<ExternalApisOptions>(builder.Configuration.GetSection("ExternalApis"));
+builder.Services.Configure<LecturerAPIOptions>(builder.Configuration.GetSection("LecturerAPIOptions"));
 
 var app = builder.Build();
 
