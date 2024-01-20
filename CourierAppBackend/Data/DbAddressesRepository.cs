@@ -1,6 +1,7 @@
 ﻿using CourierAppBackend.Abstractions.Repositories;
 using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
+using CourierAppBackend.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace CourierAppBackend.Data;
@@ -19,14 +20,8 @@ public class DbAddressesRepository(CourierAppContext context)
                                     x.ApartmentNumber == addressDTO.ApartmentNumber);
         if (address is not null)
             return address;
-        Address newAddress = new()
-        {
-            ApartmentNumber = addressDTO.ApartmentNumber,
-            City = addressDTO.City,
-            PostalCode = addressDTO.PostalCode,
-            Street = addressDTO.Street,
-            HouseNumber = addressDTO.HouseNumber,
-        };
+        // TODO
+        Address newAddress = addressDTO.FromDto();
         await context.Addresses.AddAsync(newAddress);
         await context.SaveChangesAsync();
         return newAddress;

@@ -1,4 +1,3 @@
-using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
 
 namespace CourierAppBackend.Abstractions.Repositories;

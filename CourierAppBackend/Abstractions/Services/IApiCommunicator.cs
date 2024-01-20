@@ -1,11 +1,10 @@
 ﻿using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
 
-namespace CourierAppBackend.Services
+namespace CourierAppBackend.Services;
+
+public interface IApiCommunicator
 {
-    public interface IApiCommunicator
-    {
-        Task<OfferInfo> GetOffer(Inquiry inquiry);
-        Task<string> GetToken();
-    }
+    Task<OfferInfo> GetOffer(Inquiry inquiry);
+    Task<string> GetToken();
 }

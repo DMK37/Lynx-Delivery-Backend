@@ -1,6 +1,6 @@
 ﻿namespace CourierAppBackend.Models.LecturerAPI;
 
-public class LecturerCreateInquireResponse
+public class CreateInquireResponse
 {
     public string InquiryId { get; set; } = null!;
     public decimal TotalPrice { get; set; }
