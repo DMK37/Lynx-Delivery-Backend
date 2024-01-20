@@ -7,27 +7,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CourierAppBackend.Data
 {
-    public class DbOffersRepository : IOffersRepository
+    public class DbOffersRepository(CourierAppContext context, IAddressesRepository addressesRepository,
+        IInquiriesRepository inquiriesRepository) : IOffersRepository
     {
-        private readonly CourierAppContext _context;
-        private readonly IAddressesRepository _addressesRepository;
-        private readonly IInquiriesRepository _inquiriesRepository;
-
-        public DbOffersRepository(CourierAppContext context, IAddressesRepository addressesRepository,
-            IInquiriesRepository inquiriesRepository)
-        {
-            _context = context;
-            _addressesRepository = addressesRepository;
-            _inquiriesRepository = inquiriesRepository;
-        }
+        private readonly CourierAppContext _context = context;
+        private readonly IAddressesRepository _addressesRepository = addressesRepository;
+        private readonly IInquiriesRepository _inquiriesRepository = inquiriesRepository;
 
         public async Task<Offer> CreateNewOffer(OfferC createOffer)
         {
-            var source = await _addressesRepository.FindAddress(createOffer.SourceAddress);
-            source ??= await _addressesRepository.AddAddress(createOffer.SourceAddress);
-
-            var destination = await _addressesRepository.FindAddress(createOffer.DestinationAddress);
-            destination ??= await _addressesRepository.AddAddress(createOffer.DestinationAddress);
+            var source = await _addressesRepository.AddAddress(createOffer.SourceAddress);
+            var destination = await _addressesRepository.AddAddress(createOffer.DestinationAddress);
 
             Inquiry inquiry = new()
             {
@@ -121,55 +111,9 @@ namespace CourierAppBackend.Data
             return res;
         }
 
-        public async Task<Offer> CreateOfferFromRequest(CreateOfferRequest request)
-        {
-            var source = await _addressesRepository.FindAddress(request.SourceAddress);
-            source ??= await _addressesRepository.AddAddress(request.SourceAddress);
-
-            var destination = await _addressesRepository.FindAddress(request.DestinationAddress);
-            destination ??= await _addressesRepository.AddAddress(request.DestinationAddress);
-
-            Inquiry inquiry = new()
-            {
-                DateOfInquiring = DateTime.UtcNow,
-                PickupDate = request.PickupDate,
-                DeliveryDate = request.DeliveryDate,
-                Package = request.Package,
-                SourceAddress = source,
-                DestinationAddress = destination,
-                IsCompany = request.IsCompany,
-                HighPriority = request.HighPriority,
-                DeliveryAtWeekend = request.DeliveryAtWeekend,
-                Status = InquiryStatus.Created,
-                CourierCompanyName = "TODO"
-            };
-
-            await _context.Inquiries.AddAsync(inquiry);
-            await _context.SaveChangesAsync();
-
-            var calc = new PriceCalculator();
-            var price = calc.CalculatePrice(inquiry);
-
-            Offer offer = new()
-            {
-                Inquiry = inquiry,
-                CreationDate = DateTime.UtcNow,
-                ExpireDate = DateTime.UtcNow.AddMinutes(15),
-                UpdateDate = DateTime.UtcNow,
-                Status = OfferStatus.Offered,
-                Price = price
-            };
-
-            await _context.Offers.AddAsync(offer);
-            await _context.SaveChangesAsync();
-
-            return offer;
-        }
-
         public async Task<Offer> SelectOffer(OfferSelect offerSelect)
         {
-            var address = await _addressesRepository.FindAddress(offerSelect.CustomerInfo.Address);
-            address ??= await _addressesRepository.AddAddress(offerSelect.CustomerInfo.Address);
+            var address = await _addressesRepository.AddAddress(offerSelect.CustomerInfo.Address);
 
             var offer = _context.Offers.FirstOrDefault(x => x.Id == offerSelect.OfferId);
             if (offer == null)
@@ -192,8 +136,7 @@ namespace CourierAppBackend.Data
 
         public async Task<Offer> ConfirmOffer(int id, ConfirmOfferRequest request)
         {
-            var address = await _addressesRepository.FindAddress(request.CustomerInfo.Address);
-            address ??= await _addressesRepository.AddAddress(request.CustomerInfo.Address);
+            var address = await _addressesRepository.AddAddress(request.CustomerInfo.Address);
 
             var offer = _context.Offers.FirstOrDefault(x => x.Id == id);
             if (offer == null)
@@ -257,6 +200,56 @@ namespace CourierAppBackend.Data
             await Task.Delay(30000);
             return null!;
         }
+        public async Task<CreateOfferResponse?> CreateOfferFromRequest(CreateOfferRequest request)
+        {
+            var source = await _addressesRepository.AddAddress(request.SourceAddress);
+            var destination = await _addressesRepository.AddAddress(request.DestinationAddress);
+
+            Inquiry inquiry = new()
+            {
+                DateOfInquiring = DateTime.UtcNow,
+                PickupDate = request.PickupDate,
+                DeliveryDate = request.DeliveryDate,
+                Package = request.Package,
+                SourceAddress = source,
+                DestinationAddress = destination,
+                IsCompany = request.IsCompany,
+                HighPriority = request.HighPriority,
+                DeliveryAtWeekend = request.DeliveryAtWeekend,
+                Status = InquiryStatus.Created,
+                CourierCompanyName = "TODO"
+            };
+
+            await _context.Inquiries.AddAsync(inquiry);
+            await _context.SaveChangesAsync();
+
+            var calc = new PriceCalculator();
+            var price = calc.CalculatePrice(inquiry);
+
+            Offer offer = new()
+            {
+                Inquiry = inquiry,
+                CreationDate = DateTime.UtcNow,
+                ExpireDate = DateTime.UtcNow.AddMinutes(15),
+                UpdateDate = DateTime.UtcNow,
+                Status = OfferStatus.Offered,
+                Price = price
+            };
+
+            await _context.Offers.AddAsync(offer);
+            await _context.SaveChangesAsync();
+
+            var response = new CreateOfferResponse
+            {
+                OfferId = offer.Id,
+                CreationDate = offer.CreationDate,
+                ExpireDate = offer.ExpireDate,
+                Price = calc.CalculatePriceIntoBreakdown(inquiry)
+            };
+
+            return response;
+        }
     }
+
 }
 

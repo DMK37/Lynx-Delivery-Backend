@@ -1,13 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using CourierAppBackend.Models.DTO;
+﻿using CourierAppBackend.Models.DTO;
 using CourierAppBackend.Models.Database;
 
-namespace CourierAppBackend.Abstractions.Repositories
+namespace CourierAppBackend.Abstractions.Repositories;
+
+public interface IAddressesRepository
 {
-    public interface IAddressesRepository
-    {
-        Task<Address?> FindAddress(AddressDTO address);
-        Task<Address> AddAddress(AddressDTO address);
-        Task<Address> FindOrAddAddress(Address address);
-    }
+    Task<Address> AddAddress(AddressDTO address);
 }

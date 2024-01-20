@@ -101,7 +101,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<IInquiriesRepository, DbInquiriesRepository>();
 builder.Services.AddScoped<IAddressesRepository, DbAddressesRepository>();
-builder.Services.AddScoped<IUserInfoRepository, DbUserInfoRepository>();
+builder.Services.AddScoped<IUserRepository, DbUsersRepository>();
 builder.Services.AddScoped<IOffersRepository, DbOffersRepository>();
 builder.Services.AddScoped<IOrdersRepository, DbOrdersRepository>();
 

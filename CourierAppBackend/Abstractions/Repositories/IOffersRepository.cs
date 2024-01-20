@@ -14,14 +14,12 @@ namespace CourierAppBackend.Abstractions.Repositories
         Task<List<Offer>> GetOffers();
 
         Task<List<Offer>> GetPendingOffers();
-
-        // Create offer from request from other company
-        Task<Offer?> CreateOfferFromRequest(CreateOfferRequest request);
         Task<Offer> SelectOffer(OfferSelect offerSelect);
         Task<Offer> ConfirmOffer(int id, ConfirmOfferRequest request);
 
         Task<List<OfferInfo>> GetOfferInfos(OfferAll createOffers, IEnumerable<IApiCommunicator> externalApis);
-
+        // Create offer from request from other company
+        Task<CreateOfferResponse?> CreateOfferFromRequest(CreateOfferRequest request);
 
     }
 }

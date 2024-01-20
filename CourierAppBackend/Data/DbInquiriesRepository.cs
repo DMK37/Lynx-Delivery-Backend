@@ -18,8 +18,8 @@ public class DbInquiriesRepository : IInquiriesRepository
     public async Task<List<Inquiry>> GetLastInquiries(string userId)
     {
         var inquiries = await (from i in _context.Inquiries
-                         where i.UserId == userId && (DateTime.UtcNow - i.DateOfInquiring).Days < 30
-                         select i)
+                               where i.UserId == userId && (DateTime.UtcNow - i.DateOfInquiring).Days < 30
+                               select i)
             .Include(i => i.SourceAddress)
             .Include(i => i.DestinationAddress)
             .ToListAsync();
@@ -44,10 +44,8 @@ public class DbInquiriesRepository : IInquiriesRepository
 
     public async Task<Inquiry> CreateInquiry(InquiryC inquiryC)
     {
-        var source = await _addressesRepository.FindAddress(inquiryC.SourceAddress);
-        source ??= await _addressesRepository.AddAddress(inquiryC.SourceAddress);
-        var destination = await _addressesRepository.FindAddress(inquiryC.DestinationAddress);
-        destination ??= await _addressesRepository.AddAddress(inquiryC.DestinationAddress);
+        var source = await _addressesRepository.AddAddress(inquiryC.SourceAddress);
+        var destination = await _addressesRepository.AddAddress(inquiryC.DestinationAddress);
 
         Inquiry inquiry = new()
         {
@@ -61,7 +59,7 @@ public class DbInquiriesRepository : IInquiriesRepository
             PickupDate = inquiryC.PickupDate,
             DeliveryDate = inquiryC.DeliveryDate,
             UserId = inquiryC.UserId,
-            CourierCompanyName = "LynxDelivery"        
+            CourierCompanyName = "LynxDelivery"
         };
 
         await _context.AddAsync(inquiry);

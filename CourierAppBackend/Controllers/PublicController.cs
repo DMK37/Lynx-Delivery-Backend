@@ -31,16 +31,10 @@ public class PublicController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<CreateOfferResponse>> CreateOffer([FromBody] CreateOfferRequest request)
     {
-        var offer = await _offersRepository.CreateOfferFromRequest(request);
-        if (offer is null)
+        var response = await _offersRepository.CreateOfferFromRequest(request);
+        if (response is null)
             return BadRequest();
-        var response = new CreateOfferResponse
-        {
-            OfferId = offer.Id,
-            CreationDate = offer.CreationDate,
-            ExpireDate = offer.ExpireDate,
-            Price = offer.Price
-        };
+
         return CreatedAtRoute("GetOffer", new { ID = response.OfferId }, response);
     }
 
