@@ -2,6 +2,7 @@
 using CourierAppBackend.Models;
 using CourierAppBackend.ModelsDTO;
 using CourierAppBackend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -27,6 +28,7 @@ namespace CourierAppBackend.Controllers
         // for courier 
         // GET: api/orders
         [HttpGet]
+        [Authorize("edit:order")]
         public async Task<ActionResult<List<Order>>> GetAll()
         {
             var orders = await _ordersRepository.GetOrders();
@@ -47,6 +49,7 @@ namespace CourierAppBackend.Controllers
         // endpoint for office worker to accept given offer
         // POST api/orders
         [HttpPost(Name = "PostOrder")]
+        [Authorize("read:all-pending-offers")]
         public async Task<ActionResult<Order>> CreateOrder([FromBody] OrderC orderC)
         {
             var order = await _ordersRepository.CreateOrder(orderC);
@@ -58,6 +61,7 @@ namespace CourierAppBackend.Controllers
 
         // PATCH api/orders/{id}
         [HttpPatch("{id}")]
+        [Authorize("edit:order")]
         public async Task<ActionResult<Order>> UpdateOrder(int id, [FromBody] OrderU orderU)
         {
             var order = await _ordersRepository.UpdateOrder(id,orderU);
