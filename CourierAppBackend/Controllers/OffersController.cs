@@ -11,7 +11,7 @@ namespace CourierAppBackend.Controllers;
 [Route("api/offers")]
 [ApiController]
 [ApiExplorerSettings(GroupName = "private")]
-public class OffersController(IOffersRepository offersRepository, IMessageSender messageSender, IEnumerable<IApiCommunicator> apis) 
+public class OffersController(IOffersRepository offersRepository, IMessageSender messageSender, IEnumerable<IApiCommunicator> apis)
     : ControllerBase
 {
     // POST: api/offers/{id}/select
@@ -25,8 +25,11 @@ public class OffersController(IOffersRepository offersRepository, IMessageSender
     }
 
     // GET: api/offers/{id}
+    [ProducesResponseType(typeof(Offer), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpGet("{id}")]
-    public async Task<ActionResult<Offer>> GetOffer(int id)
+    public async Task<ActionResult<Offer>> GetOffer([FromRoute] int id)
     {
         var offer = await offersRepository.GetOfferById(id);
         if (offer is null)
@@ -34,8 +37,9 @@ public class OffersController(IOffersRepository offersRepository, IMessageSender
         return Ok(offer);
     }
 
+    // GET: api/offers
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Authorize("read:all-offers")]
     public async Task<ActionResult<List<Offer>>> GetOffers()
@@ -46,6 +50,9 @@ public class OffersController(IOffersRepository offersRepository, IMessageSender
         return Ok(offers);
     }
 
+    // GET: api/offers/pending
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [HttpGet("pending")]
     [Authorize("read:all-offers")]
     public async Task<ActionResult<List<Offer>>> GetPendingOffers()
@@ -55,4 +62,29 @@ public class OffersController(IOffersRepository offersRepository, IMessageSender
             return NotFound();
         return Ok(offers);
     }
+
+    // POST: api/offers/{id}/accept
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [HttpGet("{id}/accept")]
+    public async Task<IActionResult> AcceptOffer([FromRoute] int id)
+    {
+        var offers = await offersRepository.GetPendingOffers();
+        if (offers.Count == 0)
+            return NotFound();
+        return Ok(offers);
+    }
+
+    // POST: api/offers/{id}/reject
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [HttpGet("{id}/reject")]
+    public async Task<IActionResult> RejectOffer([FromRoute] int id, [FromBody] string reason)
+    {
+        var offers = await offersRepository.GetPendingOffers();
+        if (offers.Count == 0)
+            return NotFound();
+        return Ok(offers);
+    }
+
 }
