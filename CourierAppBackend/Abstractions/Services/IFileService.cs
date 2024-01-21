@@ -1,4 +1,4 @@
-namespace CourierAppBackend.Services;
+namespace CourierAppBackend.Abstractions.Services;
 
 public interface IFileService
 {

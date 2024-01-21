@@ -2,10 +2,11 @@
 using CourierAppBackend.Models.Database;
 using CourierAppBackend.Abstractions.Repositories;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using CourierAppBackend.Abstractions.Services;
 
 namespace CourierAppBackend.Services;
 
-public class LynxDeliveryAPI(IOffersRepository offersRepository, Abstractions.Services.IMessageSender messageSender) 
+public class LynxDeliveryAPI(IOffersRepository offersRepository, Abstractions.Services.IMessageSender messageSender, IPriceCalculator priceCalculator) 
     : IApiCommunicator
 {
     public string Company => "Lynx Delivery";
@@ -19,8 +20,7 @@ public class LynxDeliveryAPI(IOffersRepository offersRepository, Abstractions.Se
         var offer = await offersRepository.CreateOffferFromOurInquiry(inquiry.Id);
         if (offer is null)
             return null!;
-        PriceCalculator calc = new();
-        var list = calc.CalculatePriceIntoBreakdown(inquiry);
+        var list = priceCalculator.CalculatePrice(inquiry).ToDto();
         return new TemporaryOffer()
         {
             OfferID = offer.Id.ToString(),

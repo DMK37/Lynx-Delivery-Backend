@@ -22,7 +22,17 @@ namespace CourierAppBackend.Services
             throw new NotImplementedException();
         }
 
-        public async Task<string> GetToken()
+        public Task<string> GetToken()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TemporaryOffer?> SelectOffer(string id, CustomerInfoDTO customerInfoDTO)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TemporaryOffer?> SelectOffer(TemporaryOffer offer, CustomerInfoDTO customerInfoDTO)
         {
             throw new NotImplementedException();
         }
