@@ -11,7 +11,7 @@ namespace CourierAppBackend.Controllers;
 [Route("api/orders")]
 [ApiController]
 [ApiExplorerSettings(GroupName = "private")]
-public class OrdersController(IOrdersRepository ordersRepository, IFileService fileService)
+public class OrdersController(IOrdersRepository ordersRepository)
     : ControllerBase
 {
     // GET: api/orders
@@ -53,15 +53,7 @@ public class OrdersController(IOrdersRepository ordersRepository, IFileService f
     }
 
 
-    // just to test upload functionality
-    [HttpPost("upload")]
-    public async Task<IActionResult> upload(IFormFile file)
-    {
-        String s = await fileService.SaveFile(file);
-        if (s == "")
-            return BadRequest();
-        return Ok(s);
-    }
+    
 
 }
 

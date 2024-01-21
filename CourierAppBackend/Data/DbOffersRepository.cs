@@ -192,7 +192,7 @@ public class DbOffersRepository(CourierAppContext context, IAddressesRepository 
         var offer = await GetOffer(offerId);
         if (offer is null)
             return false;
-        var order = ordersRepository.CreateOrder(offer);
+        var order = await ordersRepository.CreateOrder(offer);
         offer.UpdateDate = DateTime.UtcNow;
         offer.OrderID = order.Id;
         offer.Status = OfferStatus.Accepted;

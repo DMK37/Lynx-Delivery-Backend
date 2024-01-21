@@ -11,7 +11,7 @@ namespace CourierAppBackend.Controllers;
 [Route("api/offers")]
 [ApiController]
 [ApiExplorerSettings(GroupName = "private")]
-public class OffersController(IOffersRepository offersRepository, IOrdersRepository ordersRepository, IMessageSender messageSender, IEnumerable<IApiCommunicator> apis)
+public class OffersController(IOffersRepository offersRepository, IOrdersRepository ordersRepository, IMessageSender messageSender, IEnumerable<IApiCommunicator> apis, IFileService fileService)
     : ControllerBase
 {
     // POST: api/offers/{id}/select
@@ -63,9 +63,16 @@ public class OffersController(IOffersRepository offersRepository, IOrdersReposit
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    [HttpGet("{id}/accept")]
-    public async Task<IActionResult> AcceptOffer([FromRoute] int id)
+    [HttpPost("{id}/accept")]
+    public async Task<IActionResult> AcceptOffer([FromRoute] int id, IFormFile agreement, IFormFile receipt)
     {
+        String s = await fileService.SaveFile(agreement);
+        if (s == "")
+            return NotFound();
+        s = await fileService.SaveFile(receipt);
+        if (s == "")
+            return NotFound();
+        
         var accepted = await offersRepository.AcceptOffer(id);
         if (!accepted) return NotFound();
         var order = await ordersRepository.GetOrderByOfferId(id);

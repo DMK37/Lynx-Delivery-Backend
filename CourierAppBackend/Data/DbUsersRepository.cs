@@ -11,7 +11,7 @@ public class DbUsersRepository(CourierAppContext context, IAddressesRepository a
 {
     async Task<UserInfo?> GetUser(string userId)
     {
-        return await context.Users
+        return await context.UsersInfos
                             .Where(u => u.UserId == userId)
                             .Include(u => u.Address)
                             .Include(u => u.DefaultSourceAddress)
@@ -41,7 +41,7 @@ public class DbUsersRepository(CourierAppContext context, IAddressesRepository a
                 Address = address,
                 DefaultSourceAddress = defaultSourceAddress
             };
-            await context.Users.AddAsync(newUser);
+            await context.UsersInfos.AddAsync(newUser);
             await context.SaveChangesAsync();
             return userDTO;
         }
