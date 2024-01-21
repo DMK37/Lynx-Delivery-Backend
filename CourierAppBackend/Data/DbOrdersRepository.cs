@@ -69,4 +69,19 @@ public class DbOrdersRepository(CourierAppContext context)
                             .FirstOrDefaultAsync(x => x.Offer.Id == id);
         return order?.ToDTO();
     }
+
+    public async Task<List<OrderDTO>> GetUserOrders(string userId)
+    {
+        return await context.Orders
+                            .AsNoTracking()
+                            .Include(x => x.Offer)
+                            .Include(x => x.Offer.CustomerInfo)
+                            .Include(x => x.Offer.CustomerInfo!.Address)
+                            .Include(x => x.Offer.Inquiry)
+                            .Include(x => x.Offer.Inquiry.SourceAddress)
+                            .Include(x => x.Offer.Inquiry.DestinationAddress)
+                            .Where(x => x.Offer.Inquiry.UserId == userId)
+                            .Select(x => x.ToDTO())
+                            .ToListAsync();
+    }
 }

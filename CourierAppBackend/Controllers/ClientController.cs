@@ -9,7 +9,7 @@ namespace CourierAppBackend.Controllers;
 [ApiController]
 [ApiExplorerSettings(GroupName = "private")]
 [Route("api/client")]
-public class ClientController(IInquiriesRepository repository, IUserRepository usersRepository, IOffersRepository offersRepository)
+public class ClientController(IInquiriesRepository inquiriesRepository, IUserRepository usersRepository, IOrdersRepository ordersRepository)
     : ControllerBase
 {
     // POST: api/client/user-info
@@ -48,7 +48,19 @@ public class ClientController(IInquiriesRepository repository, IUserRepository u
     public async Task<ActionResult<List<InquiryDTO>>> GetLastInquiries()
     {
         string userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
-        var inquiries = await repository.GetLastInquiries(userId);
+        var inquiries = await inquiriesRepository.GetLastInquiries(userId);
         return inquiries.Count > 0 ? Ok(inquiries) : NotFound("No inquiries found");
+    }
+
+    // GET: api/client/orders
+    [ProducesResponseType(typeof(List<InquiryDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    [HttpGet("orders")]
+    public async Task<ActionResult<List<OrderDTO>>> GetOrders()
+    {
+        string userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
+        var inquiries = await ordersRepository.GetUserOrders(userId);
+        return inquiries.Count > 0 ? Ok(inquiries) : NotFound("No orders found");
     }
 }
