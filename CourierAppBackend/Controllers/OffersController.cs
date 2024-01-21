@@ -11,7 +11,7 @@ namespace CourierAppBackend.Controllers;
 [Route("api/offers")]
 [ApiController]
 [ApiExplorerSettings(GroupName = "private")]
-public class OffersController(IOffersRepository offersRepository, IMessageSender messageSender, IEnumerable<IApiCommunicator> apis)
+public class OffersController(IOffersRepository offersRepository, IOrdersRepository ordersRepository, IMessageSender messageSender, IEnumerable<IApiCommunicator> apis)
     : ControllerBase
 {
     // POST: api/offers/{id}/select
@@ -66,8 +66,12 @@ public class OffersController(IOffersRepository offersRepository, IMessageSender
     [HttpGet("{id}/accept")]
     public async Task<IActionResult> AcceptOffer([FromRoute] int id)
     {
-        var offers = await offersRepository.AcceptOffer(id);
-        return offers ? Ok() : NotFound();
+        var accepted = await offersRepository.AcceptOffer(id);
+        if (!accepted) return NotFound();
+        var order = await ordersRepository.GetOrderByOfferId(id);
+        if (order is not null)
+            await messageSender.SendOrderCreatedMessage(order);
+        return accepted ? Ok() : NotFound();
     }
 
     // POST: api/offers/{id}/reject

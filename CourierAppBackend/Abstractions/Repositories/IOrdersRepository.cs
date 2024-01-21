@@ -7,5 +7,6 @@ public interface IOrdersRepository
 {
     Task<List<OrderDTO>> GetAll();
     Task<OrderDTO?> GetOrderById(int id);
+    Task<OrderDTO?> GetOrderByOfferId(int id);
     Task<OrderDTO?> UpdateOrder(int id, OrderUpdate orderU);
 }

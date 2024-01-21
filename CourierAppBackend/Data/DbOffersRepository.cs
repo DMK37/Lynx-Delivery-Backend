@@ -8,7 +8,7 @@ using SendGrid.Helpers.Mail;
 
 namespace CourierAppBackend.Data
 {
-    public class DbOffersRepository(CourierAppContext context, IAddressesRepository addressesRepository)
+    public class DbOffersRepository(CourierAppContext context, IAddressesRepository addressesRepository, IOrdersRepository ordersRepository)
         : IOffersRepository
     {
 
@@ -44,6 +44,8 @@ namespace CourierAppBackend.Data
                 .Include(x => x.Inquiry)
                 .Include(x => x.Inquiry.SourceAddress)
                 .Include(x => x.Inquiry.DestinationAddress)
+                .Include(x => x.CustomerInfo)
+                .ThenInclude(x => x!.Address)
                 .FirstOrDefaultAsync(x => x.Id == ID);
             return result!;
         }
@@ -333,6 +335,13 @@ namespace CourierAppBackend.Data
             var res = await api.GetOfferInfo(tempOffer);
             await context.SaveChangesAsync();
             return res;
+        }
+        public async Task<OrderDTO?> GetOrderId(int offerId)
+        {
+            var offer = await GetOffer(offerId);
+            if (offer is null) return null;
+            if(offer.OrderID is null) return null;
+            return await ordersRepository.GetOrderById(offer.OrderID.Value);
         }
     }
 

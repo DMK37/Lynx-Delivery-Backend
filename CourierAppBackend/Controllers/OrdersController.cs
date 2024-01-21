@@ -43,4 +43,10 @@ public class OrdersController(IOrdersRepository ordersRepository, IMessageSender
         var order = await ordersRepository.UpdateOrder(id, orderUpdate);
         return order is null ? NotFound() : Ok(order);
     }
+
+    [HttpPost("test")]
+    public async Task<IActionResult> test()
+    {
+        return Ok();
+    }
 }
