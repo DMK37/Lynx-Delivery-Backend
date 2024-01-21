@@ -58,4 +58,20 @@ public class DbInquiriesRepository(CourierAppContext context, IAddressesReposito
         InquiryDTO inquiryDTO = inquiry.ToDto();
         return inquiryDTO;
     }
+
+    public async Task<InquiryDTO> UpdateInquiry(string userId, int inquiryId)
+    {
+        var inquiry = await context.Inquiries
+                                   .Include(x => x.SourceAddress)
+                                   .Include(x => x.DestinationAddress)
+                                   .Include(x => x.Package)
+                                   .FirstOrDefaultAsync(x => x.Id == inquiryId);
+        if (inquiry is not null && inquiry.UserId is null)
+        {
+            inquiry.UserId = userId;
+            await context.SaveChangesAsync();
+            return inquiry.ToDto();
+        }
+        return null;
+    }
 }

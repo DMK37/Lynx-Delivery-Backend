@@ -3,6 +3,7 @@ using CourierAppBackend.Models.DTO;
 using CourierAppBackend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CourierAppBackend.Controllers;
 
@@ -13,6 +14,18 @@ public class InquiriesController(IInquiriesRepository repository, IOffersReposit
     IEnumerable<IApiCommunicator> apis) 
     : ControllerBase
 {
+    // POST: api/inquiries/{id}/add
+    [ProducesResponseType(typeof(InquiryDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [HttpPost("{id}/add")]
+    public async Task<ActionResult<InquiryDTO>> AddInquiry([FromRoute] int id)
+    {
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
+        var inquiry = await repository.UpdateInquiry(userId, id);
+        return inquiry is null? BadRequest() : Ok(inquiry);
+    }
+
     // POST: api/inquiries
     [ProducesResponseType(typeof(InquiryDTO), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
