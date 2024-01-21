@@ -116,7 +116,7 @@ builder.Services.AddSendGrid(
     options => options.ApiKey = builder.Configuration["SendGrid:SENDGRID_API_KEY"]);
 builder.Services.AddScoped<IMessageSender, EmailSender>();
 
-
+builder.Services.Configure<SendGridOptions>(builder.Configuration.GetSection("SendGrid"));
 builder.Services.Configure<LecturerAPIOptions>(builder.Configuration.GetSection("LecturerAPIOptions"));
 
 var app = builder.Build();

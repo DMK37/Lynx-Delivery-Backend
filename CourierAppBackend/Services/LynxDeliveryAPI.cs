@@ -1,10 +1,11 @@
 ﻿using CourierAppBackend.Models.DTO;
 using CourierAppBackend.Models.Database;
 using CourierAppBackend.Abstractions.Repositories;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 namespace CourierAppBackend.Services;
 
-public class LynxDeliveryAPI(IOffersRepository offersRepository) 
+public class LynxDeliveryAPI(IOffersRepository offersRepository, Abstractions.Services.IMessageSender messageSender) 
     : IApiCommunicator
 {
     public string Company => "Lynx Delivery";
@@ -46,7 +47,10 @@ public class LynxDeliveryAPI(IOffersRepository offersRepository)
             CustomerInfo = customerInfoDTO,
         });
         if (offer is not null)
+        {
+            await messageSender.SendOfferSelectedMessage(offer);
             return tempOffer;
+        }
         return null;
     }
 

@@ -58,4 +58,15 @@ public class DbOrdersRepository(CourierAppContext context)
         await context.SaveChangesAsync();
         return order.ToDTO();
     }
+
+    public async Task<OrderDTO?> GetOrderByOfferId(int id)
+    {
+        var order = await context.Orders
+                            .AsNoTracking()
+                            .Include(x => x.Offer)
+                            .Include(x => x.Offer.CustomerInfo)
+                            .ThenInclude(x => x!.Address)
+                            .FirstOrDefaultAsync(x => x.Offer.Id == id);
+        return order?.ToDTO();
+    }
 }
