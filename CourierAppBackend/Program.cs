@@ -13,6 +13,10 @@ using SendGrid.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+string relativePath = @"lynx-deliv-firebase-adminsdk-gbv5b-03d6a92eda.json";
+string absolutePath = Path.GetFullPath(relativePath);
+Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", absolutePath);
+
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
@@ -45,6 +49,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization(options =>
 {
+    options.AddPolicy("edit:order",
+        policy => { policy.Requirements.Add(new RbacRequirement("edit:order")); });
+    
     options.AddPolicy("read:inquiries",
         policy => { policy.Requirements.Add(new RbacRequirement("read:inquiries")); });
     options.AddPolicy("read:all-inquiries",
@@ -53,6 +60,8 @@ builder.Services.AddAuthorization(options =>
         policy => { policy.Requirements.Add(new RbacRequirement("read:all-offers")); });
     options.AddPolicy("read:all-pending-offers",
         policy => { policy.Requirements.Add(new RbacRequirement("read:all-pending-offers")); });
+    
+    
     options.AddPolicy("edit:profile",
         policy => { policy.Requirements.Add(new RbacRequirement("edit:profile")); });
     options.AddPolicy("get:profile",
@@ -113,8 +122,12 @@ builder.Services.AddScoped<IPriceCalculator, PriceCalculator>();
 builder.Services.AddDbContext<CourierAppContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("MainDatabase")));
 
+
 builder.Services.AddSendGrid(
     options => options.ApiKey = builder.Configuration["SendGrid:SENDGRID_API_KEY"]);
+
+builder.Services.AddSingleton<IFileService, FileService>();
+
 builder.Services.AddScoped<IMessageSender, EmailSender>();
 
 builder.Services.Configure<SendGridOptions>(builder.Configuration.GetSection("SendGrid"));
