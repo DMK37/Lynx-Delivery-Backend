@@ -43,7 +43,12 @@ public class DbOrdersRepository(CourierAppContext context)
 
     public async Task<OrderDTO?> UpdateOrder(int id, OrderUpdate orderUpdate)
     {
-        var order = await context.Orders.FindAsync(id);
+        var order = await context.Orders.Include(x => x.Offer)
+            .Include(x => x.Offer.CustomerInfo)
+            .Include(x => x.Offer.CustomerInfo!.Address)
+            .Include(x => x.Offer.Inquiry)
+            .Include(x => x.Offer.Inquiry.SourceAddress)
+            .Include(x => x.Offer.Inquiry.DestinationAddress).FirstOrDefaultAsync(x => x.Id == id);
         if (order is null)
             return null;
         order.OrderStatus = orderUpdate.OrderStatus;
@@ -52,6 +57,5 @@ public class DbOrdersRepository(CourierAppContext context)
         order.Comment = orderUpdate.Comment;
         await context.SaveChangesAsync();
         return order.ToDTO();
-
     }
 }

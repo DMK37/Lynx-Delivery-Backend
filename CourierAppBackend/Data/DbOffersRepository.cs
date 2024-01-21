@@ -310,6 +310,7 @@ namespace CourierAppBackend.Data
                 return false;
             offer.UpdateDate = DateTime.UtcNow;
             offer.ReasonOfRejection = reason;
+            offer.Status = OfferStatus.Rejected;
             await context.SaveChangesAsync();
             return true;
 

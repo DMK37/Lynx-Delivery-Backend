@@ -74,7 +74,7 @@ public class OffersController(IOffersRepository offersRepository, IMessageSender
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    [HttpGet("{id}/reject")]
+    [HttpPost("{id}/reject")]
     public async Task<IActionResult> RejectOffer([FromRoute] int id, [FromBody] string reason)
     {
         var offers = await offersRepository.RejectOffer(id, reason);
