@@ -18,13 +18,18 @@ namespace CourierAppBackend.Controllers
         private IInquiriesRepository _inquiriesRepository;
         private IMessageSender _messageSender;
         private IExternalApi _contactLecturerApi;
-        public OrdersController(IOrdersRepository ordersRepository, IMessageSender messageSender, IExternalApi api, IInquiriesRepository inquiriesRepository)
+        private IFileService _fileService;
+
+        public OrdersController(IOrdersRepository ordersRepository, IMessageSender messageSender, IExternalApi api,
+            IInquiriesRepository inquiriesRepository, IFileService fileService)
         {
             _ordersRepository = ordersRepository;
             _messageSender = messageSender;
             _contactLecturerApi = api;
             _inquiriesRepository = inquiriesRepository;
+            _fileService = fileService;
         }
+
         // for courier 
         // GET: api/orders
         [HttpGet]
@@ -78,5 +83,16 @@ namespace CourierAppBackend.Controllers
 
             return Ok();
         }
+
+        
+        // just to test upload functionality
+        [HttpPost("upload")]
+        public async Task<IActionResult> upload(IFormFile file)
+        {
+            String s = await _fileService.SaveFile(file);
+            if (s == "")
+                return BadRequest();
+            return Ok(s);
+        } 
     }
 }

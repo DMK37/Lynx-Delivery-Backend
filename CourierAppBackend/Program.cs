@@ -12,6 +12,10 @@ using SendGrid.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+string relativePath = @"lynx-deliv-firebase-adminsdk-gbv5b-03d6a92eda.json";
+string absolutePath = Path.GetFullPath(relativePath);
+Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", absolutePath);
+
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
@@ -119,6 +123,7 @@ builder.Services.AddDbContext<CourierAppContext>(
 builder.Services.AddSendGrid(options =>
             options.ApiKey = builder.Configuration["SENDGRID_API_KEY"]
         );
+builder.Services.AddSingleton<IFileService, FileService>();
 builder.Services.AddScoped<IMessageSender, EmailSender>();
 
 
