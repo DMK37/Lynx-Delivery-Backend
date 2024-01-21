@@ -35,7 +35,7 @@ public class ClientController(IInquiriesRepository repository, IUserRepository u
     public async Task<ActionResult<UserDTO>> GetUserInfo()
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
-        var response = await usersRepository.GetUserById("userId");
+        var response = await usersRepository.GetUserById(userId);
         return response is null ? NotFound("User Not Found") : Ok(response);
     }
 
