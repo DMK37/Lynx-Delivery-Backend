@@ -2,8 +2,8 @@
 using SendGrid.Helpers.Mail;
 using SendGrid;
 using System.Net.Mail;
-using CourierAppBackend.Models;
-using CourierAppBackend.Abstractions;
+using CourierAppBackend.Models.Database;
+using CourierAppBackend.Abstractions.Services;
 
 namespace CourierAppBackend.Services;
 

@@ -1,5 +1,5 @@
-﻿using CourierAppBackend.Models;
-using CourierAppBackend.ModelsLecturerApi;
+﻿using CourierAppBackend.Models.Database;
+using CourierAppBackend.Models.DTO;
 
 namespace CourierAppBackend.Services;
 
@@ -21,7 +21,7 @@ public class PriceCalculator
         price.FullPrice = price.BaseDeliveryPrice + price.PriorityFee + price.DeliveryAtWeekendFee + price.WeightFee + price.SizeFee;
         return price;
     }
-    public List<PriceBreakDownItem> CalculatePriceIntoBreakdown(Inquiry inquiry)
+    public List<PriceItemDTO> CalculatePriceIntoBreakdown(Inquiry inquiry)
     {
         Price price = new()
         {
@@ -32,7 +32,7 @@ public class PriceCalculator
             SizeFee = Math.Round(inquiry.Package.Height * inquiry.Package.Width * inquiry.Package.Length * sizeMultiplier, 2, MidpointRounding.ToPositiveInfinity)
         };
         price.FullPrice = price.BaseDeliveryPrice + price.PriorityFee + price.DeliveryAtWeekendFee + price.WeightFee + price.SizeFee;
-        List<PriceBreakDownItem> result = new();
+        List<PriceItemDTO> result = new();
         result.Add(new()
         {
             Amount = price.BaseDeliveryPrice,

@@ -1,6 +1,7 @@
-using CourierAppBackend;
-using CourierAppBackend.Abstractions;
+using CourierAppBackend.Abstractions.Repositories;
+using CourierAppBackend.Abstractions.Services;
 using CourierAppBackend.Auth;
+using CourierAppBackend.Configuration;
 using CourierAppBackend.Data;
 using CourierAppBackend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,7 +22,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
         builder =>
         {
-            builder.WithOrigins(origin, deployOrigin
+            builder.WithOrigins(origin!, deployOrigin!
                ).AllowAnyMethod().AllowAnyHeader();
         });
 });
@@ -100,24 +101,23 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<IInquiriesRepository, DbInquiriesRepository>();
 builder.Services.AddScoped<IAddressesRepository, DbAddressesRepository>();
-builder.Services.AddScoped<IUserInfoRepository, DbUserInfoRepository>();
+builder.Services.AddScoped<IUserRepository, DbUsersRepository>();
 builder.Services.AddScoped<IOffersRepository, DbOffersRepository>();
 builder.Services.AddScoped<IOrdersRepository, DbOrdersRepository>();
 
-builder.Services.AddScoped<IExternalApi, LecturerApi>();
-builder.Services.AddScoped<IExternalApi, OurApi>();
-builder.Services.AddScoped<IExternalApi, FakeApi>();
+builder.Services.AddScoped<IApiCommunicator, LecturerAPI>();
+builder.Services.AddScoped<IApiCommunicator, LynxDeliveryAPI>();
+//builder.Services.AddScoped<IApiCommunicator, FakeApi>();
 
 builder.Services.AddDbContext<CourierAppContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("MainDatabase")));
 
-builder.Services.AddSendGrid(options =>
-            options.ApiKey = builder.Configuration["SENDGRID_API_KEY"]
-        );
+builder.Services.AddSendGrid(
+    options => options.ApiKey = builder.Configuration["SendGrid:SENDGRID_API_KEY"]);
 builder.Services.AddScoped<IMessageSender, EmailSender>();
 
 
-builder.Services.Configure<ExternalApisOptions>(builder.Configuration.GetSection("ExternalApis"));
+builder.Services.Configure<LecturerAPIOptions>(builder.Configuration.GetSection("LecturerAPIOptions"));
 
 var app = builder.Build();
 

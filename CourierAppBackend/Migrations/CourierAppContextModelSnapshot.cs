@@ -17,12 +17,12 @@ namespace CourierAppBackend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.13")
+                .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CourierAppBackend.Models.Address", b =>
+            modelBuilder.Entity("CourierAppBackend.Models.Database.Address", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -55,7 +55,7 @@ namespace CourierAppBackend.Migrations
                     b.ToTable("Addresses");
                 });
 
-            modelBuilder.Entity("CourierAppBackend.Models.Inquiry", b =>
+            modelBuilder.Entity("CourierAppBackend.Models.Database.Inquiry", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -68,6 +68,9 @@ namespace CourierAppBackend.Migrations
 
                     b.Property<DateTime>("DateOfInquiring")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeliveringCompany")
+                        .HasColumnType("text");
 
                     b.Property<bool>("DeliveryAtWeekend")
                         .HasColumnType("boolean");
@@ -111,7 +114,7 @@ namespace CourierAppBackend.Migrations
                     b.ToTable("Inquiries");
                 });
 
-            modelBuilder.Entity("CourierAppBackend.Models.Offer", b =>
+            modelBuilder.Entity("CourierAppBackend.Models.Database.Offer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -142,7 +145,7 @@ namespace CourierAppBackend.Migrations
                     b.ToTable("Offers");
                 });
 
-            modelBuilder.Entity("CourierAppBackend.Models.Order", b =>
+            modelBuilder.Entity("CourierAppBackend.Models.Database.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -176,7 +179,80 @@ namespace CourierAppBackend.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("CourierAppBackend.Models.UserInfo", b =>
+            modelBuilder.Entity("CourierAppBackend.Models.Database.PriceItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("TemporaryOfferId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TemporaryOfferId");
+
+                    b.ToTable("PriceItems");
+                });
+
+            modelBuilder.Entity("CourierAppBackend.Models.Database.TemporaryOffer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Company")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ExpiringAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("InquiryID")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("InquiryId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("OfferID")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OfferRequestId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InquiryId");
+
+                    b.ToTable("TemporaryOffers");
+                });
+
+            modelBuilder.Entity("CourierAppBackend.Models.Database.UserInfo", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("text");
@@ -212,25 +288,25 @@ namespace CourierAppBackend.Migrations
                     b.ToTable("UsersInfos");
                 });
 
-            modelBuilder.Entity("CourierAppBackend.Models.Inquiry", b =>
+            modelBuilder.Entity("CourierAppBackend.Models.Database.Inquiry", b =>
                 {
-                    b.HasOne("CourierAppBackend.Models.Address", "DestinationAddress")
+                    b.HasOne("CourierAppBackend.Models.Database.Address", "DestinationAddress")
                         .WithMany()
                         .HasForeignKey("DestinationAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CourierAppBackend.Models.Offer", null)
+                    b.HasOne("CourierAppBackend.Models.Database.Offer", null)
                         .WithOne("Inquiry")
-                        .HasForeignKey("CourierAppBackend.Models.Inquiry", "OfferID");
+                        .HasForeignKey("CourierAppBackend.Models.Database.Inquiry", "OfferID");
 
-                    b.HasOne("CourierAppBackend.Models.Address", "SourceAddress")
+                    b.HasOne("CourierAppBackend.Models.Database.Address", "SourceAddress")
                         .WithMany()
                         .HasForeignKey("SourceAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("CourierAppBackend.Models.Package", "Package", b1 =>
+                    b.OwnsOne("CourierAppBackend.Models.Database.Package", "Package", b1 =>
                         {
                             b1.Property<int>("InquiryId")
                                 .HasColumnType("integer");
@@ -241,8 +317,8 @@ namespace CourierAppBackend.Migrations
                             b1.Property<int>("Length")
                                 .HasColumnType("integer");
 
-                            b1.Property<decimal>("Weight")
-                                .HasColumnType("numeric");
+                            b1.Property<float>("Weight")
+                                .HasColumnType("real");
 
                             b1.Property<int>("Width")
                                 .HasColumnType("integer");
@@ -263,9 +339,9 @@ namespace CourierAppBackend.Migrations
                     b.Navigation("SourceAddress");
                 });
 
-            modelBuilder.Entity("CourierAppBackend.Models.Offer", b =>
+            modelBuilder.Entity("CourierAppBackend.Models.Database.Offer", b =>
                 {
-                    b.OwnsOne("CourierAppBackend.Models.CustomerInfo", "CustomerInfo", b1 =>
+                    b.OwnsOne("CourierAppBackend.Models.Database.CustomerInfo", "CustomerInfo", b1 =>
                         {
                             b1.Property<int>("OfferId")
                                 .HasColumnType("integer");
@@ -294,7 +370,7 @@ namespace CourierAppBackend.Migrations
 
                             b1.ToTable("Offers");
 
-                            b1.HasOne("CourierAppBackend.Models.Address", "Address")
+                            b1.HasOne("CourierAppBackend.Models.Database.Address", "Address")
                                 .WithMany()
                                 .HasForeignKey("AddressId")
                                 .OnDelete(DeleteBehavior.Cascade)
@@ -306,7 +382,7 @@ namespace CourierAppBackend.Migrations
                             b1.Navigation("Address");
                         });
 
-                    b.OwnsOne("CourierAppBackend.Models.Price", "Price", b1 =>
+                    b.OwnsOne("CourierAppBackend.Models.Database.Price", "Price", b1 =>
                         {
                             b1.Property<int>("OfferId")
                                 .HasColumnType("integer");
@@ -347,9 +423,9 @@ namespace CourierAppBackend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CourierAppBackend.Models.Order", b =>
+            modelBuilder.Entity("CourierAppBackend.Models.Database.Order", b =>
                 {
-                    b.HasOne("CourierAppBackend.Models.Offer", "Offer")
+                    b.HasOne("CourierAppBackend.Models.Database.Offer", "Offer")
                         .WithMany()
                         .HasForeignKey("OfferId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -358,15 +434,33 @@ namespace CourierAppBackend.Migrations
                     b.Navigation("Offer");
                 });
 
-            modelBuilder.Entity("CourierAppBackend.Models.UserInfo", b =>
+            modelBuilder.Entity("CourierAppBackend.Models.Database.PriceItem", b =>
                 {
-                    b.HasOne("CourierAppBackend.Models.Address", "Address")
+                    b.HasOne("CourierAppBackend.Models.Database.TemporaryOffer", null)
+                        .WithMany("PriceItems")
+                        .HasForeignKey("TemporaryOfferId");
+                });
+
+            modelBuilder.Entity("CourierAppBackend.Models.Database.TemporaryOffer", b =>
+                {
+                    b.HasOne("CourierAppBackend.Models.Database.Inquiry", "Inquiry")
+                        .WithMany()
+                        .HasForeignKey("InquiryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Inquiry");
+                });
+
+            modelBuilder.Entity("CourierAppBackend.Models.Database.UserInfo", b =>
+                {
+                    b.HasOne("CourierAppBackend.Models.Database.Address", "Address")
                         .WithMany()
                         .HasForeignKey("AddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CourierAppBackend.Models.Address", "DefaultSourceAddress")
+                    b.HasOne("CourierAppBackend.Models.Database.Address", "DefaultSourceAddress")
                         .WithMany()
                         .HasForeignKey("DefaultSourceAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -377,10 +471,15 @@ namespace CourierAppBackend.Migrations
                     b.Navigation("DefaultSourceAddress");
                 });
 
-            modelBuilder.Entity("CourierAppBackend.Models.Offer", b =>
+            modelBuilder.Entity("CourierAppBackend.Models.Database.Offer", b =>
                 {
                     b.Navigation("Inquiry")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("CourierAppBackend.Models.Database.TemporaryOffer", b =>
+                {
+                    b.Navigation("PriceItems");
                 });
 #pragma warning restore 612, 618
         }

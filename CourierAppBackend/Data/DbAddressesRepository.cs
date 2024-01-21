@@ -1,56 +1,28 @@
-﻿
-using CourierAppBackend.Abstractions;
-using CourierAppBackend.DtoModels;
-using CourierAppBackend.Models;
+﻿using CourierAppBackend.Abstractions.Repositories;
+using CourierAppBackend.Models.Database;
+using CourierAppBackend.Models.DTO;
+using CourierAppBackend.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace CourierAppBackend.Data;
 
-public class DbAddressesRepository : IAddressesRepository
+public class DbAddressesRepository(CourierAppContext context) 
+    : IAddressesRepository
 {
-    private readonly CourierAppContext _context;
-    public DbAddressesRepository(CourierAppContext context)
+    public async Task<Address> AddAddress(AddressDTO addressDTO)
     {
-        _context = context;
-    }
-    public async Task<Address?> FindAddress(AddressDTO address)
-    {
-        var result = await _context.Addresses.FirstOrDefaultAsync(x => x.City == address.City &&
-                                        x.PostalCode == address.PostalCode &&
-                                        x.Street == address.Street &&
-                                        x.HouseNumber == address.HouseNumber &&
-                                        x.ApartmentNumber == address.ApartmentNumber);
-        return result;
-    }
-    public async Task<Address> AddAddress(AddressDTO address)
-    {
-        Address newAddress = new()
-        {
-            ApartmentNumber = address.ApartmentNumber,
-            City = address.City,
-            PostalCode = address.PostalCode,
-            Street = address.Street,
-            HouseNumber = address.HouseNumber,
-        };
-        await _context.Addresses.AddAsync(newAddress);
-        await _context.SaveChangesAsync();
-
+        var address = await context.Addresses
+                                    .FirstOrDefaultAsync(x => 
+                                    x.City == addressDTO.City &&
+                                    x.PostalCode == addressDTO.PostalCode &&
+                                    x.Street == addressDTO.Street &&
+                                    x.HouseNumber == addressDTO.HouseNumber &&
+                                    x.ApartmentNumber == addressDTO.ApartmentNumber);
+        if (address is not null)
+            return address;
+        Address newAddress = addressDTO.FromDto();
+        await context.Addresses.AddAsync(newAddress);
+        await context.SaveChangesAsync();
         return newAddress;
-    }
-    public async Task<Address> FindOrAddAddress(Address address)
-    {
-        var resultAddress = await _context.Addresses.FirstOrDefaultAsync(x => x.City == address.City &&
-                                        x.PostalCode == address.PostalCode &&
-                                        x.Street == address.Street &&
-                                        x.HouseNumber == address.HouseNumber &&
-                                        x.ApartmentNumber == address.ApartmentNumber);
-        if (resultAddress is null)
-        {
-            await _context.Addresses.AddAsync(address);
-            await _context.SaveChangesAsync();
-            resultAddress = address;
-        }
-
-        return resultAddress;
     }
 }

@@ -1,71 +1,61 @@
-using CourierAppBackend.Abstractions;
-using CourierAppBackend.DtoModels;
-using CourierAppBackend.Models;
+using CourierAppBackend.Abstractions.Repositories;
+using CourierAppBackend.Models.Database;
+using CourierAppBackend.Models.DTO;
+using CourierAppBackend.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace CourierAppBackend.Data;
 
-public class DbInquiriesRepository : IInquiriesRepository
+public class DbInquiriesRepository(CourierAppContext context, IAddressesRepository addressesRepository) 
+    : IInquiriesRepository
 {
-    private readonly CourierAppContext _context;
-    private readonly IAddressesRepository _addressesRepository;
-    public DbInquiriesRepository(CourierAppContext context, IAddressesRepository addressesRepository)
+    public async Task<List<InquiryDTO>> GetLastInquiries(string userId)
     {
-        _context = context;
-        _addressesRepository = addressesRepository;
+        return await context.Inquiries
+                            .AsNoTracking()
+                            .Where(x => x.UserId == userId &&
+                            (DateTime.UtcNow - x.DateOfInquiring).Days < 30)
+                            .Include(x => x.SourceAddress)
+                            .Include(x => x.DestinationAddress)
+                            .Include(x => x.Package)
+                            .Select(x => x.ToDto())
+                            .ToListAsync();
     }
 
-    public async Task<List<Inquiry>> GetLastInquiries(string userId)
+    public async Task<List<InquiryDTO>> GetAll()
     {
-        var inquiries = await (from i in _context.Inquiries
-                         where i.UserId == userId && (DateTime.UtcNow - i.DateOfInquiring).Days < 30
-                         select i)
-            .Include(i => i.SourceAddress)
-            .Include(i => i.DestinationAddress)
-            .ToListAsync();
-        return inquiries;
+        return await context.Inquiries
+                            .AsNoTracking()
+                            .Include(x => x.SourceAddress)
+                            .Include(x => x.DestinationAddress)
+                            .Include(x => x.Package)
+                            .Select(x => x.ToDto())
+                            .ToListAsync();
     }
 
-    public async Task<List<Inquiry>> GetAll()
+    public async Task<InquiryDTO> CreateInquiry(InquiryCreate inquiryCreate)
     {
-        return await _context.Inquiries
-            .Include(x => x.SourceAddress)
-            .Include(x => x.DestinationAddress)
-            .ToListAsync();
-    }
-    public async Task<Inquiry> GetInquiryById(int id)
-    {
-        var result = await _context.Inquiries
-            .Include(x => x.SourceAddress)
-            .Include(x => x.DestinationAddress)
-            .FirstOrDefaultAsync(x => x.Id == id);
-        return result!;
+        var source = await addressesRepository.AddAddress(inquiryCreate.SourceAddress);
+        var destination = await addressesRepository.AddAddress(inquiryCreate.DestinationAddress);
+        Inquiry inquiry = inquiryCreate.FromDto();
+        inquiry.SourceAddress = source;
+        inquiry.DestinationAddress = destination;
+        await context.AddAsync(inquiry);
+        await context.SaveChangesAsync();
+        InquiryDTO inquiryDTO = inquiry.ToDto();
+        return inquiryDTO;
     }
 
-    public async Task<Inquiry> CreateInquiry(InquiryC inquiryC)
+    public async Task<InquiryDTO?> GetInquiryById(int id)
     {
-        var source = await _addressesRepository.FindAddress(inquiryC.SourceAddress);
-        source ??= await _addressesRepository.AddAddress(inquiryC.SourceAddress);
-        var destination = await _addressesRepository.FindAddress(inquiryC.DestinationAddress);
-        destination ??= await _addressesRepository.AddAddress(inquiryC.DestinationAddress);
-
-        Inquiry inquiry = new()
-        {
-            DateOfInquiring = DateTime.UtcNow,
-            SourceAddress = source,
-            DestinationAddress = destination,
-            Package = inquiryC.Package,
-            IsCompany = inquiryC.IsCompany,
-            HighPriority = inquiryC.HighPriority,
-            DeliveryAtWeekend = inquiryC.DeliveryAtWeekend,
-            PickupDate = inquiryC.PickupDate,
-            DeliveryDate = inquiryC.DeliveryDate,
-            UserId = inquiryC.UserId,
-            CourierCompanyName = "LynxDelivery"        
-        };
-
-        await _context.AddAsync(inquiry);
-        await _context.SaveChangesAsync();
-        return inquiry;
+        var inquiry = await context.Inquiries
+                                   .Include(x => x.SourceAddress)
+                                   .Include(x => x.DestinationAddress)
+                                   .Include(x => x.Package)
+                                   .FirstOrDefaultAsync(x => x.Id == id);
+        if (inquiry is null)
+            return null;
+        InquiryDTO inquiryDTO = inquiry.ToDto();
+        return inquiryDTO;
     }
 }
