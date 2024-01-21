@@ -1,4 +1,5 @@
 ﻿using CourierAppBackend.Abstractions.Repositories;
+using CourierAppBackend.Abstractions.Services;
 using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
 using CourierAppBackend.Models.LynxDeliveryAPI;
@@ -8,7 +9,7 @@ using SendGrid.Helpers.Mail;
 
 namespace CourierAppBackend.Data
 {
-    public class DbOffersRepository(CourierAppContext context, IAddressesRepository addressesRepository, IOrdersRepository ordersRepository)
+    public class DbOffersRepository(CourierAppContext context, IAddressesRepository addressesRepository, IOrdersRepository ordersRepository, IPriceCalculator priceCalculator)
         : IOffersRepository
     {
 
@@ -18,9 +19,7 @@ namespace CourierAppBackend.Data
             if (inquiry is null)
                 return null!;
 
-            //also need to calulate price
-            var calc = new PriceCalculator();
-            var price = calc.CalculatePrice(inquiry);
+            var price = priceCalculator.CalculatePrice(inquiry);
 
             Offer offer = new()
             {
@@ -225,8 +224,7 @@ namespace CourierAppBackend.Data
             await context.Inquiries.AddAsync(inquiry);
             await context.SaveChangesAsync();
 
-            var calc = new PriceCalculator();
-            var price = calc.CalculatePrice(inquiry);
+            var price = priceCalculator.CalculatePrice(inquiry);
 
             Offer offer = new()
             {
@@ -246,7 +244,7 @@ namespace CourierAppBackend.Data
                 OfferId = offer.Id,
                 CreationDate = offer.CreationDate,
                 ExpireDate = offer.ExpireDate,
-                Price = calc.CalculatePrice(inquiry).ToDto()
+                Price = priceCalculator.CalculatePrice(inquiry).ToDto()
             };
 
             return response;
@@ -328,10 +326,10 @@ namespace CourierAppBackend.Data
                                          .FirstOrDefaultAsync(x =>
                                          x.Inquiry.Id == id &&
                                          x.Company == inquiry.DeliveringCompany);
-            if (tempOffer is null) 
+            if (tempOffer is null)
                 return null;
             var api = apis.Find(x => x.Company == tempOffer.Company);
-            if (api is null) 
+            if (api is null)
                 return null;
             var res = await api.GetOfferInfo(tempOffer);
             await context.SaveChangesAsync();
@@ -341,7 +339,7 @@ namespace CourierAppBackend.Data
         {
             var offer = await GetOffer(offerId);
             if (offer is null) return null;
-            if(offer.OrderID is null) return null;
+            if (offer.OrderID is null) return null;
             return await ordersRepository.GetOrderById(offer.OrderID.Value);
         }
     }
