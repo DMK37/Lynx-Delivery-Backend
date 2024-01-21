@@ -17,7 +17,7 @@ public class ClientController(IInquiriesRepository repository, IUserRepository u
     [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [HttpPost("user-info")]
-    [Authorize("edit:profile")]
+    //[Authorize("edit:profile")]
     public async Task<ActionResult<UserDTO>> EditUser([FromBody] UserDTO userDTO)
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
@@ -31,7 +31,7 @@ public class ClientController(IInquiriesRepository repository, IUserRepository u
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpGet("user-info")]
-    [Authorize("get:profile")]
+    //[Authorize("get:profile")]
     public async Task<ActionResult<UserDTO>> GetUserInfo()
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
@@ -42,12 +42,13 @@ public class ClientController(IInquiriesRepository repository, IUserRepository u
     // GET: api/client/inquiries
     [ProducesResponseType(typeof(List<InquiryDTO>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpGet("inquiries")]
-    [Authorize("get:last-inquiries")]
+    //[Authorize("get:last-inquiries")]
     public async Task<ActionResult<List<InquiryDTO>>> GetLastInquiries()
     {
         string userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
         var inquiries = await repository.GetLastInquiries(userId);
-        return Ok(inquiries);
+        return inquiries.Count > 0 ? Ok(inquiries) : NotFound("No inquiries found");
     }
 }

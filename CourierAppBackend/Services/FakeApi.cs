@@ -17,6 +17,11 @@ namespace CourierAppBackend.Services
             };
         }
 
+        public Task<OfferInfo?> GetOfferInfo(TemporaryOffer inquiry)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<string> GetToken()
         {
             throw new NotImplementedException();

@@ -22,7 +22,7 @@ public class LynxDeliveryAPI(IOffersRepository offersRepository)
         var list = calc.CalculatePriceIntoBreakdown(inquiry);
         return new TemporaryOffer()
         {
-            OfferID = offer.Id,
+            OfferID = offer.Id.ToString(),
             Company = "Lynx Delivery",
             Inquiry = inquiry,
             TotalPrice = list.Sum(x => x.Amount),
@@ -37,20 +37,9 @@ public class LynxDeliveryAPI(IOffersRepository offersRepository)
         };
     }
 
-    public async Task<TemporaryOffer?> SelectOffer(string id, CustomerInfoDTO customerInfoDTO)
-    {
-        int offerId = int.Parse(id);
-        await offersRepository.SelectOffers(new()
-        {
-            OfferId = offerId,
-            CustomerInfo = customerInfoDTO,
-        });
-        throw new NotImplementedException();
-    }
-
     public async Task<TemporaryOffer?> SelectOffer(TemporaryOffer tempOffer, CustomerInfoDTO customerInfoDTO)
     {
-        int offerId = tempOffer.OfferID;
+        int offerId = int.Parse(tempOffer.OfferID);
         var offer = await offersRepository.SelectOffers(new()
         {
             OfferId = offerId,
@@ -59,5 +48,11 @@ public class LynxDeliveryAPI(IOffersRepository offersRepository)
         if (offer is not null)
             return tempOffer;
         return null;
+    }
+
+    public async Task<OfferInfo?> GetOfferInfo(TemporaryOffer inquiry)
+    {
+        var offer = await offersRepository.GetOffer(int.Parse(inquiry.OfferID));
+        return offer.ToInfo();
     }
 }

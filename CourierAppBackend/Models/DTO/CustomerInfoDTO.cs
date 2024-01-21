@@ -1,5 +1,4 @@
-﻿using CourierAppBackend.Models;
-
+﻿
 namespace CourierAppBackend.Models.DTO;
 
 public class CustomerInfoDTO

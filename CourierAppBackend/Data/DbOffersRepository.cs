@@ -4,6 +4,7 @@ using CourierAppBackend.Models.DTO;
 using CourierAppBackend.Models.LynxDeliveryAPI;
 using CourierAppBackend.Services;
 using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Mail;
 
 namespace CourierAppBackend.Data
 {
@@ -37,7 +38,7 @@ namespace CourierAppBackend.Data
             return offer;
         }
 
-        public async Task<Offer> GetOfferById(int ID)
+        public async Task<Offer> GetOffer(int ID)
         {
             var result = await context.Offers
                 .Include(x => x.Inquiry)
@@ -47,23 +48,31 @@ namespace CourierAppBackend.Data
             return result!;
         }
 
-        public async Task<List<Offer>> GetOffers()
+        public async Task<List<OfferDTO>> GetAll()
         {
-            var res = await context.Offers
-                .Include(x => x.Inquiry)
-                .Include(x => x.Inquiry.SourceAddress)
-                .Include(x => x.Inquiry.DestinationAddress)
-                .ToListAsync();
-            return res;
+            return await context.Offers
+                                .AsNoTracking()
+                                .Include(x => x.Inquiry)
+                                .Include(x => x.Inquiry.SourceAddress)
+                                .Include(x => x.Inquiry.DestinationAddress)
+                                .Include(x => x.CustomerInfo)
+                                .ThenInclude(x => x!.Address)
+                                .Select(x => x.ToDTO())
+                                .ToListAsync();
         }
 
-        public async Task<List<Offer>> GetPendingOffers()
+        public async Task<List<OfferDTO>> GetPending()
         {
-            var res = await context.Offers.Where(x => x.Status == OfferStatus.Pending).Include(x => x.Inquiry)
-                .Include(x => x.Inquiry.SourceAddress)
-                .Include(x => x.Inquiry.DestinationAddress)
-                .ToListAsync();
-            return res;
+            return await context.Offers
+                                .AsNoTracking()
+                                .Where(x => x.Status == OfferStatus.Pending)
+                                .Include(x => x.Inquiry)
+                                .Include(x => x.Inquiry.SourceAddress)
+                                .Include(x => x.Inquiry.DestinationAddress)
+                                .Include(x => x.CustomerInfo)
+                                .ThenInclude(x => x!.Address)
+                                .Select(x => x.ToDTO())
+                                .ToListAsync();
         }
 
         public async Task<Offer> SelectOffers(OfferSelect offerSelect)
@@ -71,7 +80,7 @@ namespace CourierAppBackend.Data
             var address = await addressesRepository.AddAddress(offerSelect.CustomerInfo.Address);
 
             var offer = await context.Offers
-                                     .Include(x => x.Inquiry)    
+                                     .Include(x => x.Inquiry)
                                      .FirstOrDefaultAsync(x => x.Id == offerSelect.OfferId);
             if (offer == null)
                 return null!;
@@ -252,7 +261,7 @@ namespace CourierAppBackend.Data
             if (api is null)
                 return false;
             var offer = await api.SelectOffer(tempOffer, customerInfoDTO);
-            if(offer is not null)
+            if (offer is not null)
             {
                 tempOffer.Inquiry.Status = InquiryStatus.Accepted;
                 tempOffer.Inquiry.DeliveringCompany = tempOffer.Company;
@@ -260,6 +269,70 @@ namespace CourierAppBackend.Data
                 return true;
             }
             return false;
+        }
+
+        public async Task<OfferDTO?> GetOfferById(int id)
+        {
+            var offer = await GetOffer(id);
+            if (offer is null)
+                return null;
+            // TODO
+            return offer.ToDTO();
+        }
+
+        public async Task<bool> AcceptOffer(int id)
+        {
+            var offer = await GetOffer(id);
+            if (offer is null)
+                return false;
+            Order order = new()
+            {
+                OfferID = offer.Id,
+                Offer = offer,
+                OrderStatus = OrderStatus.Accepted,
+                LastUpdate = DateTime.UtcNow,
+                CourierName = ""
+            };
+            await context.Orders.AddAsync(order);
+            await context.SaveChangesAsync();
+            offer.UpdateDate = DateTime.UtcNow;
+            offer.OrderID = order.Id;
+            offer.Status = OfferStatus.Accepted;
+            await context.SaveChangesAsync();
+            return true;
+
+        }
+
+        public async Task<bool> RejectOffer(int id, string reason)
+        {
+            var offer = await GetOffer(id);
+            if (offer is null)
+                return false;
+            offer.UpdateDate = DateTime.UtcNow;
+            offer.ReasonOfRejection = reason;
+            await context.SaveChangesAsync();
+            return true;
+
+        }
+
+        public async Task<OfferInfo?> GetOfferInfo(int id, List<IApiCommunicator> apis)
+        {
+            var inquiry = await context.Inquiries
+                                       .FindAsync(id);
+            if (inquiry is null)
+                return null;
+            var tempOffer = await context.TemporaryOffers
+                                         .FirstOrDefaultAsync(x =>
+                                         x.Inquiry.Id == id &&
+                                         x.Company == inquiry.DeliveringCompany);
+            if (tempOffer is null) 
+                return null;
+            var api = apis.Find(x => x.Company == tempOffer.Company);
+            if (api is null) 
+                return null;
+            var res = await api.GetOfferInfo(tempOffer);
+            await context.SaveChangesAsync();
+            return res;
         }
     }
 

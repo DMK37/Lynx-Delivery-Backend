@@ -25,66 +25,59 @@ public class OffersController(IOffersRepository offersRepository, IMessageSender
     }
 
     // GET: api/offers/{id}
-    [ProducesResponseType(typeof(Offer), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OfferDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpGet("{id}")]
-    public async Task<ActionResult<Offer>> GetOffer([FromRoute] int id)
+    public async Task<ActionResult<OfferDTO>> GetOffer([FromRoute] int id)
     {
         var offer = await offersRepository.GetOfferById(id);
-        if (offer is null)
-            return NotFound();
-        return Ok(offer);
+        return offer is not null ? Ok(offer) : NotFound();
     }
 
     // GET: api/offers
-    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<OfferDTO>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpGet]
-    [Authorize("read:all-offers")]
+    //[Authorize("read:all-offers")]
     public async Task<ActionResult<List<Offer>>> GetOffers()
     {
-        var offers = await offersRepository.GetOffers();
-        if (offers.Count == 0)
-            return NotFound();
-        return Ok(offers);
+        var offers = await offersRepository.GetAll();
+        return offers is not null ? Ok(offers) : NotFound();
     }
 
     // GET: api/offers/pending
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(List<OfferDTO>), StatusCodes.Status404NotFound)]
     [HttpGet("pending")]
-    [Authorize("read:all-offers")]
-    public async Task<ActionResult<List<Offer>>> GetPendingOffers()
+    //[Authorize("read:all-offers")]
+    public async Task<ActionResult<List<OfferDTO>>> GetPendingOffers()
     {
-        var offers = await offersRepository.GetPendingOffers();
-        if (offers.Count == 0)
-            return NotFound();
-        return Ok(offers);
+        var offers = await offersRepository.GetPending();
+        return offers is not null ? Ok(offers) : NotFound();
     }
 
     // POST: api/offers/{id}/accept
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpGet("{id}/accept")]
     public async Task<IActionResult> AcceptOffer([FromRoute] int id)
     {
-        var offers = await offersRepository.GetPendingOffers();
-        if (offers.Count == 0)
-            return NotFound();
-        return Ok(offers);
+        var offers = await offersRepository.AcceptOffer(id);
+        return offers ? Ok() : NotFound();
     }
 
     // POST: api/offers/{id}/reject
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpGet("{id}/reject")]
     public async Task<IActionResult> RejectOffer([FromRoute] int id, [FromBody] string reason)
     {
-        var offers = await offersRepository.GetPendingOffers();
-        if (offers.Count == 0)
-            return NotFound();
-        return Ok(offers);
+        var offers = await offersRepository.RejectOffer(id, reason);
+        return offers ? Ok() : NotFound();
     }
-
 }

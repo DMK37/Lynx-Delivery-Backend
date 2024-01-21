@@ -5,8 +5,7 @@ namespace CourierAppBackend.Abstractions.Repositories;
 
 public interface IOrdersRepository
 {
-    Task<List<Order>> GetOrders();
-    Task<Order?> GetOrderById(int id);
-    Task<Order> CreateOrder(OrderC orderC);
-    Task<Order?> UpdateOrder(int id, OrderU orderU);
+    Task<List<OrderDTO>> GetAll();
+    Task<OrderDTO?> GetOrderById(int id);
+    Task<OrderDTO?> UpdateOrder(int id, OrderUpdate orderU);
 }

@@ -2,7 +2,7 @@
 
 namespace CourierAppBackend.Models.DTO;
 
-public class OrderU
+public class OrderUpdate
 {
     public OrderStatus OrderStatus { get; set; }
     public string? Comment { get; set; }

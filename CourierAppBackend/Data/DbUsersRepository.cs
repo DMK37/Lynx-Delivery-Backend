@@ -1,7 +1,6 @@
 using CourierAppBackend.Abstractions.Repositories;
 using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
-using CourierAppBackend.Models.LecturerAPI;
 using CourierAppBackend.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -54,7 +53,6 @@ public class DbUsersRepository(CourierAppContext context, IAddressesRepository a
         var userInfo = await GetUserInfoById(id);
         if (userInfo is null)
             return null;
-        // TODO
         UserDTO user = userInfo.ToDto();
         return user;
     }

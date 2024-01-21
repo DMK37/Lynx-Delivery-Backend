@@ -20,7 +20,6 @@ public class DbAddressesRepository(CourierAppContext context)
                                     x.ApartmentNumber == addressDTO.ApartmentNumber);
         if (address is not null)
             return address;
-        // TODO
         Address newAddress = addressDTO.FromDto();
         await context.Addresses.AddAsync(newAddress);
         await context.SaveChangesAsync();

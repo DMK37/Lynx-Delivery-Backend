@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CourierAppBackend.Data;
 
-public class DbInquiriesRepository(CourierAppContext context, IAddressesRepository addressesRepository) : IInquiriesRepository
+public class DbInquiriesRepository(CourierAppContext context, IAddressesRepository addressesRepository) 
+    : IInquiriesRepository
 {
     public async Task<List<InquiryDTO>> GetLastInquiries(string userId)
     {
@@ -17,7 +18,6 @@ public class DbInquiriesRepository(CourierAppContext context, IAddressesReposito
                             .Include(x => x.SourceAddress)
                             .Include(x => x.DestinationAddress)
                             .Include(x => x.Package)
-                            // TODO
                             .Select(x => x.ToDto())
                             .ToListAsync();
     }
@@ -29,7 +29,6 @@ public class DbInquiriesRepository(CourierAppContext context, IAddressesReposito
                             .Include(x => x.SourceAddress)
                             .Include(x => x.DestinationAddress)
                             .Include(x => x.Package)
-                            // TODO
                             .Select(x => x.ToDto())
                             .ToListAsync();
     }
@@ -38,13 +37,11 @@ public class DbInquiriesRepository(CourierAppContext context, IAddressesReposito
     {
         var source = await addressesRepository.AddAddress(inquiryCreate.SourceAddress);
         var destination = await addressesRepository.AddAddress(inquiryCreate.DestinationAddress);
-        // TODO
         Inquiry inquiry = inquiryCreate.FromDto();
         inquiry.SourceAddress = source;
         inquiry.DestinationAddress = destination;
         await context.AddAsync(inquiry);
         await context.SaveChangesAsync();
-        // TODO
         InquiryDTO inquiryDTO = inquiry.ToDto();
         return inquiryDTO;
     }
@@ -58,7 +55,6 @@ public class DbInquiriesRepository(CourierAppContext context, IAddressesReposito
                                    .FirstOrDefaultAsync(x => x.Id == id);
         if (inquiry is null)
             return null;
-        // TODO
         InquiryDTO inquiryDTO = inquiry.ToDto();
         return inquiryDTO;
     }

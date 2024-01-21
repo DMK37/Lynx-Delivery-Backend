@@ -28,7 +28,7 @@ public class PublicController(IOffersRepository offersRepository, IOrdersReposit
     [HttpGet("offers/{id}", Name = "GetOffer")]
     public async Task<ActionResult<GetOfferResponse>> GetOffer(int id)
     {
-        var offer = await offersRepository.GetOfferById(id);
+        var offer = await offersRepository.GetOffer(id);
         if (offer is null)
             return NotFound();
         var response = new GetOfferResponse

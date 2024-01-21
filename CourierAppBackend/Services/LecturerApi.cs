@@ -44,7 +44,6 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
 
     public async Task<TemporaryOffer> GetOffer(Inquiry inquiry)
     {
-        // TODO
         CreateInquireRequest req = inquiry.ToRequest();
         var token = await GetToken();
         HttpClient client = new();
@@ -76,7 +75,6 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
 
     public async Task<TemporaryOffer?> SelectOffer(TemporaryOffer offer, CustomerInfoDTO customerInfoDTO)
     {
-        // TODO
         CreateOfferRequest req = new()
         {
             InquiryId = offer.InquiryID,
@@ -101,6 +99,47 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
             return null;
         string responseBody = await response.Content.ReadAsStringAsync();
         CreateOfferResponse apiResponse = JsonConvert.DeserializeObject<CreateOfferResponse>(responseBody)!;
+        offer.OfferRequestId = apiResponse.OfferRequestId;
         return offer;
+    }
+
+    public async Task<OfferInfo?> GetOfferInfo(TemporaryOffer offer)
+    {
+        var token = await GetToken();
+        HttpClient client = new();
+        if (offer.OfferRequestId != string.Empty)
+        {
+            string offerRequestId = offer.OfferRequestId;
+            var getStatusRequest = new HttpRequestMessage(HttpMethod.Get, options.apiEndPoint + $"/offer/request/{offerRequestId}/status");
+            getStatusRequest.Headers.Add("Authorization", $"Bearer {token}");
+            var getStatusResponse = await client.SendAsync(getStatusRequest);
+            if (getStatusResponse.StatusCode != HttpStatusCode.OK)
+                return null;
+            string getStatusResponseBody = await getStatusResponse.Content.ReadAsStringAsync();
+            CheckOfferStatusResponse checkOffer = JsonConvert.DeserializeObject<CheckOfferStatusResponse>(getStatusResponseBody)!;
+            if (checkOffer.IsReady)
+            {
+                offer.OfferRequestId = string.Empty;
+                offer.OfferID = checkOffer.OfferId!;
+                var confirmRequest = new HttpRequestMessage(HttpMethod.Get, options.apiEndPoint + $"/offer/{offer.OfferID}/confirm");
+                confirmRequest.Headers.Add("Authorization", $"Bearer {token}");
+                var resp = await client.SendAsync(confirmRequest);
+                if (resp.StatusCode != HttpStatusCode.OK)
+                    return null;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        string offerId = offer.OfferID;
+        var getOfferRequest = new HttpRequestMessage(HttpMethod.Get, options.apiEndPoint + $"/offer/{offerId}");
+        getOfferRequest.Headers.Add("Authorization", $"Bearer {token}");
+        var getOfferResponse = await client.SendAsync(getOfferRequest);
+        if (getOfferResponse.StatusCode != HttpStatusCode.OK)
+            return null;
+        string getOfferResponseBody = await getOfferResponse.Content.ReadAsStringAsync();
+        GetOfferResponse getOffer = JsonConvert.DeserializeObject<GetOfferResponse>(getOfferResponseBody)!;
+        return getOffer.ToDTO();
     }
 }

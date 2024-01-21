@@ -37,7 +37,7 @@ public class InquiriesController(IInquiriesRepository repository, IOffersReposit
     // GET: api/inquiries
     [ProducesResponseType(typeof(List<InquiryDTO>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-    [Authorize("read:all-inquiries")]
+    //[Authorize("read:all-inquiries")]
     [HttpGet]
     public async Task<ActionResult<List<InquiryDTO>>> GetAll()
     {
@@ -52,6 +52,16 @@ public class InquiriesController(IInquiriesRepository repository, IOffersReposit
     public async Task<ActionResult<List<TemporaryOfferDTO>>> CreateOffers([FromRoute] int id)
     {
         var offers = await offersRepository.GetOffers(id, apis.ToList());
+        return offers is null ? BadRequest() : Ok(offers);
+    }
+
+    // GET: api/inquiries/{id}/offer
+    [ProducesResponseType(typeof(OfferInfo), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    [HttpGet("{id}/offer")]
+    public async Task<ActionResult<List<OfferInfo>>> GetOfferInfo([FromRoute] int id)
+    {
+        var offers = await offersRepository.GetOfferInfo(id, apis.ToList());
         return offers is null ? BadRequest() : Ok(offers);
     }
 }
