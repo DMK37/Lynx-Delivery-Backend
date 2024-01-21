@@ -116,7 +116,6 @@ builder.Services.AddScoped<IOrdersRepository, DbOrdersRepository>();
 
 builder.Services.AddScoped<IApiCommunicator, LecturerAPI>();
 builder.Services.AddScoped<IApiCommunicator, LynxDeliveryAPI>();
-//builder.Services.AddScoped<IApiCommunicator, FakeApi>();
 builder.Services.AddScoped<IPriceCalculator, PriceCalculator>();
 
 builder.Services.AddDbContext<CourierAppContext>(

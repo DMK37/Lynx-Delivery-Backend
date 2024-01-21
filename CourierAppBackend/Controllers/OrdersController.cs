@@ -11,7 +11,7 @@ namespace CourierAppBackend.Controllers;
 [Route("api/orders")]
 [ApiController]
 [ApiExplorerSettings(GroupName = "private")]
-public class OrdersController(IOrdersRepository ordersRepository, IMessageSender messageSender, IFileService fileService)
+public class OrdersController(IOrdersRepository ordersRepository, IFileService fileService)
     : ControllerBase
 {
     // GET: api/orders
