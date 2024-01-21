@@ -59,7 +59,7 @@ public class DbInquiriesRepository(CourierAppContext context, IAddressesReposito
         return inquiryDTO;
     }
 
-    public async Task<InquiryDTO> UpdateInquiry(string userId, int inquiryId)
+    public async Task<InquiryDTO?> UpdateInquiry(string userId, int inquiryId)
     {
         var inquiry = await context.Inquiries
                                    .Include(x => x.SourceAddress)

@@ -20,7 +20,7 @@ public class LynxDeliveryAPI(IOffersRepository offersRepository, Abstractions.Se
         if (offer is null)
             return null!;
         PriceCalculator calc = new();
-        var list = calc.CalculatePriceIntoBreakdown(inquiry);
+        var list = calc.CalculatePrice(inquiry).ToDto();
         return new TemporaryOffer()
         {
             OfferID = offer.Id.ToString(),

@@ -22,7 +22,7 @@ namespace CourierAppBackend.Services
             throw new NotImplementedException();
         }
 
-        public async Task<string> GetToken()
+        public Task<string> GetToken()
         {
             throw new NotImplementedException();
         }

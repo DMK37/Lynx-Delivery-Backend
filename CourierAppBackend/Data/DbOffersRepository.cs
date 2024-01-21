@@ -246,7 +246,7 @@ namespace CourierAppBackend.Data
                 OfferId = offer.Id,
                 CreationDate = offer.CreationDate,
                 ExpireDate = offer.ExpireDate,
-                Price = calc.CalculatePriceIntoBreakdown(inquiry)
+                Price = calc.CalculatePrice(inquiry).ToDto()
             };
 
             return response;
