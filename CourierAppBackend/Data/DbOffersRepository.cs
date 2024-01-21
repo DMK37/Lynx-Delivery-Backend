@@ -13,6 +13,16 @@ public class DbOffersRepository(CourierAppContext context, IAddressesRepository 
     ITemporaryOffersRepository temporaryOffersRepository)
     : IOffersRepository
 {
+    public async Task<OrderDTO?> GetOrderId(int offerId)
+    {
+        var offer = await GetOffer(offerId);
+        if (offer is null) 
+            return null;
+        if (offer.OrderID is null) 
+            return null;
+        return await ordersRepository.GetOrderById(offer.OrderID.Value);
+    }
+
     public async Task<Offer?> GetOffer(int offerId)
     {
         return await context.Offers
@@ -157,32 +167,42 @@ public class DbOffersRepository(CourierAppContext context, IAddressesRepository 
         return false;
     }
 
-    public async Task<bool> AcceptOffer(int id)
+    public async Task<OfferInfo?> GetOfferInfo(int inquiryId, List<IApiCommunicator> apis)
     {
-        var offer = await GetOffer(id);
+        var inquiry = await context.Inquiries
+                                   .FindAsync(inquiryId);
+        if (inquiry is null)
+            return null;
+        var tempOffer = await context.TemporaryOffers
+                                     .FirstOrDefaultAsync(x =>
+                                     x.Inquiry.Id == inquiryId &&
+                                     x.Company == inquiry.DeliveringCompany);
+        if (tempOffer is null)
+            return null;
+        var api = apis.Find(x => x.Company == tempOffer.Company);
+        if (api is null)
+            return null;
+        var offerInfo = await api.GetOfferInfo(tempOffer);
+        await context.SaveChangesAsync();
+        return offerInfo;
+    }
+
+    public async Task<bool> AcceptOffer(int offerId)
+    {
+        var offer = await GetOffer(offerId);
         if (offer is null)
             return false;
-        Order order = new()
-        {
-            OfferID = offer.Id,
-            Offer = offer,
-            OrderStatus = OrderStatus.Accepted,
-            LastUpdate = DateTime.UtcNow,
-            CourierName = ""
-        };
-        await context.Orders.AddAsync(order);
-        await context.SaveChangesAsync();
+        var order = ordersRepository.CreateOrder(offer);
         offer.UpdateDate = DateTime.UtcNow;
         offer.OrderID = order.Id;
         offer.Status = OfferStatus.Accepted;
         await context.SaveChangesAsync();
         return true;
-
     }
 
-    public async Task<bool> RejectOffer(int id, string reason)
+    public async Task<bool> RejectOffer(int offerId, string reason)
     {
-        var offer = await GetOffer(id);
+        var offer = await GetOffer(offerId);
         if (offer is null)
             return false;
         offer.UpdateDate = DateTime.UtcNow;
@@ -190,37 +210,9 @@ public class DbOffersRepository(CourierAppContext context, IAddressesRepository 
         offer.Status = OfferStatus.Rejected;
         await context.SaveChangesAsync();
         return true;
-
     }
 
-    public async Task<OfferInfo?> GetOfferInfo(int id, List<IApiCommunicator> apis)
-    {
-        var inquiry = await context.Inquiries
-                                   .FindAsync(id);
-        if (inquiry is null)
-            return null;
-        var tempOffer = await context.TemporaryOffers
-                                     .FirstOrDefaultAsync(x =>
-                                     x.Inquiry.Id == id &&
-                                     x.Company == inquiry.DeliveringCompany);
-        if (tempOffer is null)
-            return null;
-        var api = apis.Find(x => x.Company == tempOffer.Company);
-        if (api is null)
-            return null;
-        var res = await api.GetOfferInfo(tempOffer);
-        await context.SaveChangesAsync();
-        return res;
-    }
-    public async Task<OrderDTO?> GetOrderId(int offerId)
-    {
-        var offer = await GetOffer(offerId);
-        if (offer is null) return null;
-        if (offer.OrderID is null) return null;
-        return await ordersRepository.GetOrderById(offer.OrderID.Value);
-    }
-
-    public async Task<CreateOfferResponse> CreateOffer(CreateOfferRequest request)
+    public async Task<CreateOfferResponse?> CreateOfferAPI(CreateOfferRequest request)
     {
         var source = await addressesRepository.AddAddress(request.SourceAddress);
         var destination = await addressesRepository.AddAddress(request.DestinationAddress);
@@ -237,59 +229,43 @@ public class DbOffersRepository(CourierAppContext context, IAddressesRepository 
             HighPriority = request.HighPriority,
             DeliveryAtWeekend = request.DeliveryAtWeekend,
             Status = InquiryStatus.Created,
-            CourierCompanyName = "TODO"
+            CourierCompanyName = "Other Company"
         };
-
         await context.Inquiries.AddAsync(inquiry);
         await context.SaveChangesAsync();
-
-        var price = priceCalculator.CalculatePrice(inquiry);
-
-        Offer offer = new()
-        {
-            Inquiry = inquiry,
-            CreationDate = DateTime.UtcNow,
-            ExpireDate = DateTime.UtcNow.AddMinutes(15),
-            UpdateDate = DateTime.UtcNow,
-            Status = OfferStatus.Offered,
-            Price = price
-        };
-
-        await context.Offers.AddAsync(offer);
-        await context.SaveChangesAsync();
-
+        var offer = await CreateOffer(inquiry.Id);
+        if (offer is null)
+            return null;
         var response = new CreateOfferResponse
         {
             OfferId = offer.Id,
             CreationDate = offer.CreationDate,
             ExpireDate = offer.ExpireDate,
-            Price = priceCalculator.CalculatePrice(inquiry).ToDTO()
+            Price = offer.Price.ToDTO()
         };
-
         return response;
     }
 
-    public async Task<Offer> ConfirmOffer(int id, ConfirmOfferRequest request)
+    public async Task<GetOfferResponse?> GetOfferAPI(int offerId)
+    {
+        var offer = await GetOffer(offerId);
+        if(offer is null) 
+            return null;
+        return offer.ToResponse();
+    }
+
+    public async Task<bool> ConfirmOfferAPI(int id, ConfirmOfferRequest request)
     {
         var address = await addressesRepository.AddAddress(request.CustomerInfo.Address);
-
-        var offer = await context.Offers.FirstOrDefaultAsync(x => x.Id == id);
-        if (offer == null)
-            return null!;
+        var offer = await GetOffer(id);
+        if (offer is null || offer.Status != OfferStatus.Offered)
+            return false;
         offer.Status = OfferStatus.Pending;
         offer.UpdateDate = DateTime.UtcNow;
-        offer.CustomerInfo = new()
-        {
-            CompanyName = request.CustomerInfo.CompanyName,
-            FirstName = request.CustomerInfo.FirstName,
-            LastName = request.CustomerInfo.LastName,
-            Address = address,
-            Email = request.CustomerInfo.Email
-        };
-
+        offer.CustomerInfo = request.CustomerInfo.FromDTO();
+        offer.CustomerInfo.Address = address;
         await context.SaveChangesAsync();
-
-        return offer;
+        return true;
     }
 }
 

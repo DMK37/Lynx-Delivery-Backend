@@ -1,6 +1,7 @@
 ﻿using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
 using CourierAppBackend.Models.LecturerAPI;
+using CourierAppBackend.Models.LynxDeliveryAPI;
 
 namespace CourierAppBackend.Services;
 
@@ -147,7 +148,7 @@ public static class Mapping
             CourierCompanyName = "Lynx Delivery"
         };
     }
-    public static CreateInquireRequest ToRequest(this Inquiry inquiry)
+    public static CreateInquireRequestLecturer ToRequest(this Inquiry inquiry)
     {
         return new()
         {
@@ -257,7 +258,7 @@ public static class Mapping
             CourierName = order.CourierName
         };
     }
-    public static OfferInfo ToDTO(this GetOfferResponse response)
+    public static OfferInfo ToDTO(this GetOfferResponseLecturer response)
     {
         return new()
         {
@@ -301,6 +302,41 @@ public static class Mapping
             OfferStatus = offer.Status.ToString(),
             BuyerName = $"{offer.CustomerInfo!.FirstName} {offer.CustomerInfo.LastName}",
             BuyerAddress = offer.CustomerInfo.Address.ToDTO()
+        };
+    }
+    public static GetOfferResponse ToResponse(this Offer offer)
+    {
+        return new()
+        {
+            OfferId = offer.Id,
+            PickupDate = offer.Inquiry.PickupDate,
+            DeliveryDate = offer.Inquiry.DeliveryDate,
+            Package = offer.Inquiry.Package,
+            SourceAddress = offer.Inquiry.SourceAddress.ToDTO(),
+            DestinationAddress = offer.Inquiry.DestinationAddress.ToDTO(),
+            IsCompany = offer.Inquiry.IsCompany,
+            HighPriority = offer.Inquiry.HighPriority,
+            DeliveryAtWeekend = offer.Inquiry.DeliveryAtWeekend,
+            CreationDate = offer.CreationDate,
+            ExpireDate = offer.ExpireDate,
+            UpdateDate = offer.UpdateDate,
+            Status = offer.Status.ToString(),
+            CustomerInfo = offer.CustomerInfo?.ToDTO(),
+            ReasonOfRejection = offer.ReasonOfRejection,
+            TotalPrice = offer.Price.FullPrice,
+            Price = offer.Price.ToDTO(),
+            OrderId = offer.OrderID
+        };
+    }
+    public static GetOrderResponse ToResponse(this Order order)
+    {
+        return new()
+        {
+            OfferID = order.OfferID,
+            OrderStatus = order.OrderStatus.ToString(),
+            Comment = order.Comment,
+            LastUpdate = order.LastUpdate,
+            CourierName = order.CourierName
         };
     }
 }

@@ -44,7 +44,7 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
 
     public async Task<TemporaryOffer?> GetOffer(Inquiry inquiry)
     {
-        CreateInquireRequest req = inquiry.ToRequest();
+        CreateInquireRequestLecturer req = inquiry.ToRequest();
         var token = await GetToken();
         HttpClient client = new();
         var request = new HttpRequestMessage(HttpMethod.Post, options.apiEndPoint + "/Inquires");
@@ -55,7 +55,7 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
         if (response.StatusCode != HttpStatusCode.OK)
             return null!;
         string responseBody = await response.Content.ReadAsStringAsync();
-        CreateInquireResponse apiResponse = JsonConvert.DeserializeObject<CreateInquireResponse>(responseBody)!;
+        CreateInquireResponseLecturer apiResponse = JsonConvert.DeserializeObject<CreateInquireResponseLecturer>(responseBody)!;
         return new TemporaryOffer()
         {
             Inquiry = inquiry,
@@ -75,7 +75,7 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
 
     public async Task<TemporaryOffer?> SelectOffer(TemporaryOffer offer, CustomerInfoDTO customerInfoDTO)
     {
-        CreateOfferRequest req = new()
+        CreateOfferRequestLecturer req = new()
         {
             InquiryId = offer.InquiryID,
             Name = $"{customerInfoDTO.FirstName} {customerInfoDTO.LastName}",
@@ -98,7 +98,7 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
         if (response.StatusCode != HttpStatusCode.OK)
             return null;
         string responseBody = await response.Content.ReadAsStringAsync();
-        CreateOfferResponse apiResponse = JsonConvert.DeserializeObject<CreateOfferResponse>(responseBody)!;
+        CreateOfferResponseLecturer apiResponse = JsonConvert.DeserializeObject<CreateOfferResponseLecturer>(responseBody)!;
         offer.OfferRequestId = apiResponse.OfferRequestId;
         return offer;
     }
@@ -139,7 +139,7 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
         if (getOfferResponse.StatusCode != HttpStatusCode.OK)
             return null;
         string getOfferResponseBody = await getOfferResponse.Content.ReadAsStringAsync();
-        GetOfferResponse getOffer = JsonConvert.DeserializeObject<GetOfferResponse>(getOfferResponseBody)!;
+        GetOfferResponseLecturer getOffer = JsonConvert.DeserializeObject<GetOfferResponseLecturer>(getOfferResponseBody)!;
         return getOffer.ToDTO();
     }
 }

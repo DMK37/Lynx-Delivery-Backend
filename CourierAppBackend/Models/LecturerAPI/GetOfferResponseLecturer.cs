@@ -2,7 +2,7 @@
 
 namespace CourierAppBackend.Models.LecturerAPI
 {
-    public class GetOfferResponse
+    public class GetOfferResponseLecturer
     {
         public string OfferId { get; set; } = null!;
         public DimensionsLecturer Dimensions { get; set; } = null!;

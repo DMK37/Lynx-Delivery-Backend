@@ -1,6 +1,7 @@
 ﻿using CourierAppBackend.Abstractions.Repositories;
 using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
+using CourierAppBackend.Models.LynxDeliveryAPI;
 using CourierAppBackend.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -83,5 +84,26 @@ public class DbOrdersRepository(CourierAppContext context)
                             .Where(x => x.Offer.Inquiry.UserId == userId)
                             .Select(x => x.ToDTO())
                             .ToListAsync();
+    }
+
+    public async Task<Order> CreateOrder(Offer offer)
+    {
+        Order order = new()
+        {
+            OfferID = offer.Id,
+            Offer = offer,
+            OrderStatus = OrderStatus.Accepted,
+            LastUpdate = DateTime.UtcNow,
+            CourierName = ""
+        };
+        await context.Orders.AddAsync(order);
+        await context.SaveChangesAsync();
+        return order;
+    }
+
+    public async Task<GetOrderResponse?> GetOrderAPI(int orderId)
+    {
+        var order = await GetOrder(orderId);
+        return order?.ToResponse();
     }
 }

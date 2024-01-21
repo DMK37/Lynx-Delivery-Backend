@@ -1,6 +1,6 @@
 ﻿namespace CourierAppBackend.Models.LecturerAPI;
 
-public class CreateInquireRequest
+public class CreateInquireRequestLecturer
 {
     public DimensionsLecturer Dimensions { get; set; } = null!;
     public string Currency { get; set; } = "Pln";

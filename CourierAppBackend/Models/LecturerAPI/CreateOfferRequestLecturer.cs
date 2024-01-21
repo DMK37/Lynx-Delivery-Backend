@@ -1,6 +1,6 @@
 ﻿namespace CourierAppBackend.Models.LecturerAPI;
 
-public class CreateOfferRequest
+public class CreateOfferRequestLecturer
 {
     public string InquiryId { get; set; } = null!;
     public string Name { get; set; } = null!;
