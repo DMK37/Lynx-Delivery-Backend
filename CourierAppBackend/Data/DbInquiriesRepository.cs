@@ -6,9 +6,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CourierAppBackend.Data;
 
-public class DbInquiriesRepository(CourierAppContext context, IAddressesRepository addressesRepository) 
+public class DbInquiriesRepository(CourierAppContext context, IAddressesRepository addressesRepository)
     : IInquiriesRepository
 {
+    public async Task<Inquiry?> GetInquiry(int inquiryId)
+    {
+        return await context.Inquiries
+                            .Include(x => x.SourceAddress)
+                            .Include(x => x.DestinationAddress)
+                            .FirstOrDefaultAsync(x => x.Id == inquiryId);
+    }
+
+    public async Task<InquiryDTO?> GetInquiryById(int id)
+    {
+        var inquiry = await GetInquiry(id);
+        return inquiry?.ToDto();
+    }
+
     public async Task<List<InquiryDTO>> GetLastInquiries(string userId)
     {
         return await context.Inquiries
@@ -17,7 +31,6 @@ public class DbInquiriesRepository(CourierAppContext context, IAddressesReposito
                             (DateTime.UtcNow - x.DateOfInquiring).Days < 30)
                             .Include(x => x.SourceAddress)
                             .Include(x => x.DestinationAddress)
-                            .Include(x => x.Package)
                             .Select(x => x.ToDto())
                             .ToListAsync();
     }
@@ -28,7 +41,6 @@ public class DbInquiriesRepository(CourierAppContext context, IAddressesReposito
                             .AsNoTracking()
                             .Include(x => x.SourceAddress)
                             .Include(x => x.DestinationAddress)
-                            .Include(x => x.Package)
                             .Select(x => x.ToDto())
                             .ToListAsync();
     }
@@ -42,36 +54,16 @@ public class DbInquiriesRepository(CourierAppContext context, IAddressesReposito
         inquiry.DestinationAddress = destination;
         await context.AddAsync(inquiry);
         await context.SaveChangesAsync();
-        InquiryDTO inquiryDTO = inquiry.ToDto();
-        return inquiryDTO;
-    }
-
-    public async Task<InquiryDTO?> GetInquiryById(int id)
-    {
-        var inquiry = await context.Inquiries
-                                   .Include(x => x.SourceAddress)
-                                   .Include(x => x.DestinationAddress)
-                                   .Include(x => x.Package)
-                                   .FirstOrDefaultAsync(x => x.Id == id);
-        if (inquiry is null)
-            return null;
-        InquiryDTO inquiryDTO = inquiry.ToDto();
-        return inquiryDTO;
+        return inquiry.ToDto();
     }
 
     public async Task<InquiryDTO?> UpdateInquiry(string userId, int inquiryId)
     {
-        var inquiry = await context.Inquiries
-                                   .Include(x => x.SourceAddress)
-                                   .Include(x => x.DestinationAddress)
-                                   .Include(x => x.Package)
-                                   .FirstOrDefaultAsync(x => x.Id == inquiryId);
-        if (inquiry is not null && inquiry.UserId is null)
-        {
-            inquiry.UserId = userId;
-            await context.SaveChangesAsync();
-            return inquiry.ToDto();
-        }
-        return null;
+        var inquiry = await GetInquiry(inquiryId);
+        if (inquiry is null || inquiry.UserId is not null) 
+            return null;
+        inquiry.UserId = userId;
+        await context.SaveChangesAsync();
+        return inquiry.ToDto();
     }
 }

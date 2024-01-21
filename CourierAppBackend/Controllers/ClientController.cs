@@ -14,7 +14,6 @@ public class ClientController(IInquiriesRepository inquiriesRepository, IUserRep
 {
     // POST: api/client/user-info
     [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [HttpPost("user-info")]
     //[Authorize("edit:profile")]
@@ -35,8 +34,8 @@ public class ClientController(IInquiriesRepository inquiriesRepository, IUserRep
     public async Task<ActionResult<UserDTO>> GetUserInfo()
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
-        var response = await usersRepository.GetUserById(userId);
-        return response is null ? NotFound("User Not Found") : Ok(response);
+        var user = await usersRepository.GetUserById(userId);
+        return user is null ? NotFound("User Not Found") : Ok(user);
     }
 
     // GET: api/client/inquiries

@@ -113,6 +113,7 @@ builder.Services.AddScoped<IAddressesRepository, DbAddressesRepository>();
 builder.Services.AddScoped<IUserRepository, DbUsersRepository>();
 builder.Services.AddScoped<IOffersRepository, DbOffersRepository>();
 builder.Services.AddScoped<IOrdersRepository, DbOrdersRepository>();
+builder.Services.AddScoped<ITemporaryOffersRepository, DbTemporaryOffersRepository>();
 
 builder.Services.AddScoped<IApiCommunicator, LecturerAPI>();
 builder.Services.AddScoped<IApiCommunicator, LynxDeliveryAPI>();

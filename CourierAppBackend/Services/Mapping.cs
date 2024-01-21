@@ -6,7 +6,7 @@ namespace CourierAppBackend.Services;
 
 public static class Mapping
 {
-    public static AddressDTO ToDto(this LecturerAddress address)
+    public static AddressDTO ToDTO(this AddressLecturer address)
     {
         return new()
         {
@@ -17,18 +17,7 @@ public static class Mapping
             PostalCode = address.ZipCode
         };
     }
-    public static Address FromDto(this AddressDTO addressDTO)
-    {
-        return new()
-        {
-            ApartmentNumber = addressDTO.ApartmentNumber,
-            City = addressDTO.City,
-            PostalCode = addressDTO.PostalCode,
-            Street = addressDTO.Street,
-            HouseNumber = addressDTO.HouseNumber,
-        };
-    }
-    public static AddressDTO ToDto(this Address address)
+    public static AddressDTO ToDTO(this Address address)
     {
         return new()
         {
@@ -39,7 +28,18 @@ public static class Mapping
             HouseNumber = address.HouseNumber
         };
     }
-    public static CustomerInfoDTO ToDto(this CustomerInfo customerInfo)
+    public static Address FromDTO(this AddressDTO addressDTO)
+    {
+        return new()
+        {
+            ApartmentNumber = addressDTO.ApartmentNumber,
+            City = addressDTO.City,
+            PostalCode = addressDTO.PostalCode,
+            Street = addressDTO.Street,
+            HouseNumber = addressDTO.HouseNumber,
+        };
+    }
+    public static CustomerInfoDTO ToDTO(this CustomerInfo customerInfo)
     {
         return new()
         {
@@ -47,7 +47,29 @@ public static class Mapping
             LastName = customerInfo.LastName,
             CompanyName = customerInfo.CompanyName,
             Email = customerInfo.Email,
-            Address = customerInfo.Address.ToDto()
+            Address = customerInfo.Address.ToDTO()
+        };
+    }
+    public static CustomerInfo FromDTO(this CustomerInfoDTO customerInfoDTO)
+    {
+        return new()
+        {
+            FirstName = customerInfoDTO.FirstName,
+            LastName = customerInfoDTO.LastName,
+            CompanyName = customerInfoDTO.CompanyName,
+            Email = customerInfoDTO.Email,
+            Address = customerInfoDTO.Address.FromDTO()
+        };
+    }
+    public static TemporaryOfferDTO ToDTO(this TemporaryOffer temporaryOffer)
+    {
+        return new TemporaryOfferDTO()
+        {
+            Id = temporaryOffer.Id,
+            Company = temporaryOffer.Company,
+            TotalPrice = temporaryOffer.TotalPrice,
+            ExpiringAt = temporaryOffer.ExpiringAt,
+            PriceBreakDown = temporaryOffer.PriceItems.ToDTO()
         };
     }
     public static UserDTO ToDto(this UserInfo userInfo)
@@ -159,7 +181,7 @@ public static class Mapping
             isComapny = inquiry.IsCompany
         };
     }
-    public static List<PriceItemDTO> ToDto(this Price price)
+    public static List<PriceItemDTO> ToDTO(this Price price)
     {
         List<PriceItemDTO> result =
         [
@@ -197,6 +219,15 @@ public static class Mapping
         result.RemoveAll(x => x.Amount == 0);
         return result;
     }
+    public static List<PriceItemDTO> ToDTO(this List<PriceItem> priceItems)
+    {
+        return priceItems.Select(x => new PriceItemDTO()
+        {
+            Currency = x.Currency,
+            Amount = x.Amount,
+            Description = x.Description
+        }).ToList();
+    }
     public static OfferDTO ToDTO(this Offer offer)
     {
         return new()
@@ -209,7 +240,7 @@ public static class Mapping
             Status = offer.Status,
             Price = offer.Price,
             ReasonOfRejection = offer.ReasonOfRejection,
-            CustomerInfo = offer.CustomerInfo?.ToDto(),
+            CustomerInfo = offer.CustomerInfo?.ToDTO(),
             OrderID = offer.OrderID
         };
     }
@@ -238,8 +269,8 @@ public static class Mapping
                 Width = (int)(response.Dimensions.Width * 100),
                 Weight = response.Weight
             },
-            Source = response.Source.ToDto(),
-            Destination = response.Destination.ToDto(),
+            Source = response.Source.ToDTO(),
+            Destination = response.Destination.ToDTO(),
             PickupDate = response.PickupDate,
             DeliveryDate = response.DeliveryDate,
             DeliveryInWeekend = response.DeliveryInWeekend,
@@ -249,7 +280,7 @@ public static class Mapping
             LastUpdateDate = response.DecisionDate,
             OfferStatus = response.OfferStatus!,
             BuyerName = response.BuyerName!,
-            BuyerAddress = response.BuyerAddress.ToDto()
+            BuyerAddress = response.BuyerAddress.ToDTO()
         };
     }
     public static OfferInfo ToInfo(this Offer offer)
@@ -258,18 +289,18 @@ public static class Mapping
         {
             OfferId = offer.Id.ToString(),
             Package = offer.Inquiry.Package,
-            Source = offer.Inquiry.SourceAddress.ToDto(),
-            Destination = offer.Inquiry.DestinationAddress.ToDto(),
+            Source = offer.Inquiry.SourceAddress.ToDTO(),
+            Destination = offer.Inquiry.DestinationAddress.ToDTO(),
             PickupDate = offer.Inquiry.PickupDate,
             DeliveryDate = offer.Inquiry.DeliveryDate,
             DeliveryInWeekend = offer.Inquiry.DeliveryAtWeekend,
             HighPriority = offer.Inquiry.HighPriority,
-            PriceItems = offer.Price.ToDto(),
-            TotalPrice = offer.Price.ToDto().Sum(x => x.Amount),
+            PriceItems = offer.Price.ToDTO(),
+            TotalPrice = offer.Price.ToDTO().Sum(x => x.Amount),
             LastUpdateDate = offer.UpdateDate,
             OfferStatus = offer.Status.ToString(),
             BuyerName = $"{offer.CustomerInfo!.FirstName} {offer.CustomerInfo.LastName}",
-            BuyerAddress = offer.CustomerInfo.Address.ToDto()
+            BuyerAddress = offer.CustomerInfo.Address.ToDTO()
         };
     }
 }

@@ -7,7 +7,7 @@ public interface IApiCommunicator
 {
     string Company { get; }
     Task<string> GetToken();
-    Task<TemporaryOffer> GetOffer(Inquiry inquiry);
+    Task<TemporaryOffer?> GetOffer(Inquiry inquiry);
     Task<TemporaryOffer?> SelectOffer(TemporaryOffer offer, CustomerInfoDTO customerInfoDTO);
     Task<OfferInfo?> GetOfferInfo(TemporaryOffer inquiry);
 }

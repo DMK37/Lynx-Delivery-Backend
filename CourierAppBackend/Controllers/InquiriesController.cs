@@ -11,7 +11,7 @@ namespace CourierAppBackend.Controllers;
 [ApiExplorerSettings(GroupName = "private")]
 [Route("api/inquiries")]
 public class InquiriesController(IInquiriesRepository repository, IOffersRepository offersRepository,
-    IEnumerable<IApiCommunicator> apis) 
+    IEnumerable<IApiCommunicator> apis)
     : ControllerBase
 {
     // POST: api/inquiries/{id}/add
@@ -23,7 +23,7 @@ public class InquiriesController(IInquiriesRepository repository, IOffersReposit
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
         var inquiry = await repository.UpdateInquiry(userId, id);
-        return inquiry is null? BadRequest() : Ok(inquiry);
+        return inquiry is null ? BadRequest() : Ok(inquiry);
     }
 
     // POST: api/inquiries
@@ -50,12 +50,13 @@ public class InquiriesController(IInquiriesRepository repository, IOffersReposit
     // GET: api/inquiries
     [ProducesResponseType(typeof(List<InquiryDTO>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     //[Authorize("read:all-inquiries")]
     [HttpGet]
     public async Task<ActionResult<List<InquiryDTO>>> GetAll()
     {
         var inquiries = await repository.GetAll();
-        return Ok(inquiries);
+        return inquiries.Count > 0 ? Ok(inquiries) : NotFound();
     }
 
     // POST: api/inquiries/{id}/offers
@@ -74,7 +75,7 @@ public class InquiriesController(IInquiriesRepository repository, IOffersReposit
     [HttpGet("{id}/offer")]
     public async Task<ActionResult<List<OfferInfo>>> GetOfferInfo([FromRoute] int id)
     {
-        var offers = await offersRepository.GetOfferInfo(id, apis.ToList());
-        return offers is null ? BadRequest() : Ok(offers);
+        var offer = await offersRepository.GetOfferInfo(id, apis.ToList());
+        return offer is null ? BadRequest() : Ok(offer);
     }
 }

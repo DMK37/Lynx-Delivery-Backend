@@ -9,20 +9,26 @@ namespace CourierAppBackend.Data;
 public class DbUsersRepository(CourierAppContext context, IAddressesRepository addressesRepository)
     : IUserRepository
 {
-    public async Task<UserInfo?> GetUserInfoById(string id)
+    async Task<UserInfo?> GetUser(string userId)
     {
-        return await context.UsersInfos
-                            .Where(u => u.UserId == id)
+        return await context.Users
+                            .Where(u => u.UserId == userId)
                             .Include(u => u.Address)
                             .Include(u => u.DefaultSourceAddress)
                             .FirstOrDefaultAsync();
+    }
+
+    public async Task<UserDTO?> GetUserById(string userId)
+    {
+        var userInfo = await GetUser(userId);
+        return userInfo?.ToDto();
     }
 
     public async Task<UserDTO> EditUser(UserDTO userDTO)
     {
         var address = await addressesRepository.AddAddress(userDTO.Address);
         var defaultSourceAddress = await addressesRepository.AddAddress(userDTO.DefaultSourceAddress);
-        var user = await GetUserInfoById(userDTO.UserId);
+        var user = await GetUser(userDTO.UserId);
         if (user is null)
         {
             UserInfo newUser = new()
@@ -33,9 +39,9 @@ public class DbUsersRepository(CourierAppContext context, IAddressesRepository a
                 CompanyName = userDTO.CompanyName,
                 Email = userDTO.Email,
                 Address = address,
-                DefaultSourceAddress = defaultSourceAddress,
+                DefaultSourceAddress = defaultSourceAddress
             };
-            await context.UsersInfos.AddAsync(newUser);
+            await context.Users.AddAsync(newUser);
             await context.SaveChangesAsync();
             return userDTO;
         }
@@ -46,14 +52,5 @@ public class DbUsersRepository(CourierAppContext context, IAddressesRepository a
         user.DefaultSourceAddress = defaultSourceAddress;
         await context.SaveChangesAsync();
         return userDTO;
-    }
-
-    public async Task<UserDTO?> GetUserById(string id)
-    {
-        var userInfo = await GetUserInfoById(id);
-        if (userInfo is null)
-            return null;
-        UserDTO user = userInfo.ToDto();
-        return user;
     }
 }

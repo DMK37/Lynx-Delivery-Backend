@@ -1,12 +1,11 @@
 ﻿using CourierAppBackend.Models.DTO;
 using CourierAppBackend.Models.Database;
 using CourierAppBackend.Abstractions.Repositories;
-using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using CourierAppBackend.Abstractions.Services;
 
 namespace CourierAppBackend.Services;
 
-public class LynxDeliveryAPI(IOffersRepository offersRepository, Abstractions.Services.IMessageSender messageSender, IPriceCalculator priceCalculator) 
+public class LynxDeliveryAPI(IOffersRepository offersRepository, IMessageSender messageSender, IPriceCalculator priceCalculator) 
     : IApiCommunicator
 {
     public string Company => "Lynx Delivery";
@@ -15,12 +14,12 @@ public class LynxDeliveryAPI(IOffersRepository offersRepository, Abstractions.Se
         throw new NotImplementedException();
     }
 
-    public async Task<TemporaryOffer> GetOffer(Inquiry inquiry)
+    public async Task<TemporaryOffer?> GetOffer(Inquiry inquiry)
     {
-        var offer = await offersRepository.CreateOffferFromOurInquiry(inquiry.Id);
+        var offer = await offersRepository.CreateOffer(inquiry.Id);
         if (offer is null)
             return null!;
-        var list = priceCalculator.CalculatePrice(inquiry).ToDto();
+        var list = priceCalculator.CalculatePrice(inquiry).ToDTO();
         return new TemporaryOffer()
         {
             OfferID = offer.Id.ToString(),
@@ -41,11 +40,7 @@ public class LynxDeliveryAPI(IOffersRepository offersRepository, Abstractions.Se
     public async Task<TemporaryOffer?> SelectOffer(TemporaryOffer tempOffer, CustomerInfoDTO customerInfoDTO)
     {
         int offerId = int.Parse(tempOffer.OfferID);
-        var offer = await offersRepository.SelectOffers(new()
-        {
-            OfferId = offerId,
-            CustomerInfo = customerInfoDTO,
-        });
+        var offer = await offersRepository.SelectOffer(offerId,customerInfoDTO);
         if (offer is not null)
         {
             await messageSender.SendOfferSelectedMessage(offer);

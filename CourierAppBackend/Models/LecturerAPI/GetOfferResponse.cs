@@ -5,9 +5,9 @@ namespace CourierAppBackend.Models.LecturerAPI
     public class GetOfferResponse
     {
         public string OfferId { get; set; } = null!;
-        public Dimensions Dimensions { get; set; } = null!;
-        public LecturerAddress Source { get; set;} = null!;
-        public LecturerAddress Destination { get; set; } = null!;
+        public DimensionsLecturer Dimensions { get; set; } = null!;
+        public AddressLecturer Source { get; set;} = null!;
+        public AddressLecturer Destination { get; set; } = null!;
         public float Weight { get; set; }
         public string? WeightUnit { get; set; }
         public DateTime PickupDate {  get; set; }
@@ -24,7 +24,7 @@ namespace CourierAppBackend.Models.LecturerAPI
         public DateTime DecisionDate {  get; set; }
         public string? OfferStatus {  get; set; }
         public string? BuyerName { get; set; }
-        public LecturerAddress BuyerAddress { get; set; } = null!;
+        public AddressLecturer BuyerAddress { get; set; } = null!;
 
     }
 }

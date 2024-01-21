@@ -1,6 +1,6 @@
 ﻿namespace CourierAppBackend.Models.LecturerAPI;
 
-public class Dimensions
+public class DimensionsLecturer
 {
     public float Width { get; set; }
     public float Height { get; set; }

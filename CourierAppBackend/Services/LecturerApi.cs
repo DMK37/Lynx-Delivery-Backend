@@ -42,7 +42,7 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
         return accessToken;
     }
 
-    public async Task<TemporaryOffer> GetOffer(Inquiry inquiry)
+    public async Task<TemporaryOffer?> GetOffer(Inquiry inquiry)
     {
         CreateInquireRequest req = inquiry.ToRequest();
         var token = await GetToken();
