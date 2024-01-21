@@ -18,7 +18,7 @@ public class LynxDeliveryAPI(IOffersRepository offersRepository, IMessageSender 
     {
         var offer = await offersRepository.CreateOffer(inquiry.Id);
         if (offer is null)
-            return null!;
+            return null;
         var list = priceCalculator.CalculatePrice(inquiry).ToDTO();
         return new TemporaryOffer()
         {
@@ -28,12 +28,7 @@ public class LynxDeliveryAPI(IOffersRepository offersRepository, IMessageSender 
             TotalPrice = list.Sum(x => x.Amount),
             ExpiringAt = offer.ExpireDate.ToUniversalTime(),
             Currency = "Pln",
-            PriceItems = list.Select(x => new PriceItem()
-            {
-                Amount = x.Amount,
-                Description = x.Description,
-                Currency = x.Currency,
-            }).ToList()
+            PriceItems = list.FromDTO()
         };
     }
 
@@ -52,6 +47,6 @@ public class LynxDeliveryAPI(IOffersRepository offersRepository, IMessageSender 
     public async Task<OfferInfo?> GetOfferInfo(TemporaryOffer inquiry)
     {
         var offer = await offersRepository.GetOffer(int.Parse(inquiry.OfferID));
-        return offer.ToInfo();
+        return offer?.ToInfo();
     }
 }

@@ -47,7 +47,7 @@ public class OrdersController(IOrdersRepository ordersRepository, IFileService f
     }
 
     [HttpPost("test")]
-    public async Task<IActionResult> test()
+    public IActionResult Test()
     {
         return Ok();
     }

@@ -229,6 +229,15 @@ public static class Mapping
             Description = x.Description
         }).ToList();
     }
+    public static List<PriceItem> FromDTO(this List<PriceItemDTO> priceItemDTOs)
+    {
+        return priceItemDTOs.Select(x => new PriceItem()
+        {
+            Amount = x.Amount,
+            Description = x.Description,
+            Currency = x.Currency,
+        }).ToList();
+    }
     public static OfferDTO ToDTO(this Offer offer)
     {
         return new()

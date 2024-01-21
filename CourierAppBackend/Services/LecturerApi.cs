@@ -64,12 +64,7 @@ public class LecturerAPI(IOptions<LecturerAPIOptions> options)
             TotalPrice = apiResponse.TotalPrice,
             ExpiringAt = apiResponse.ExpiringAt.ToUniversalTime(),
             Currency = apiResponse.Currency,
-            PriceItems = apiResponse.PriceBreakDown.Select(x => new PriceItem()
-            {
-                Amount = x.Amount,
-                Description = x.Description,
-                Currency = x.Currency,
-            }).ToList()
+            PriceItems = apiResponse.PriceBreakDown.FromDTO()
         };
     }
 

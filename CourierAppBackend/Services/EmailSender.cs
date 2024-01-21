@@ -1,12 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
 using SendGrid.Helpers.Mail;
 using SendGrid;
-using System.Net.Mail;
 using CourierAppBackend.Models.Database;
 using CourierAppBackend.Abstractions.Services;
-using Humanizer;
 using CourierAppBackend.Configuration;
-using System;
 using CourierAppBackend.Models.DTO;
 
 namespace CourierAppBackend.Services;
