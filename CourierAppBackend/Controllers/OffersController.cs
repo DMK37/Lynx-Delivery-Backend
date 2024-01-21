@@ -63,7 +63,7 @@ public class OffersController(IOffersRepository offersRepository, IOrdersReposit
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    [HttpGet("{id}/accept")]
+    [HttpPost("{id}/accept")]
     public async Task<IActionResult> AcceptOffer([FromRoute] int id)
     {
         var accepted = await offersRepository.AcceptOffer(id);
