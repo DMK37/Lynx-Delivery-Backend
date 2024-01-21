@@ -4,6 +4,7 @@ namespace CourierAppBackend.Models.DTO
 {
     public class OrderDTO
     {
+        public int Id { get; set; }
         public int OfferID { get; set; }
         public OfferDTO Offer { get; set; } = null!;
         public OrderStatus OrderStatus { get; set; }

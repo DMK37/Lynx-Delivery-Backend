@@ -217,6 +217,7 @@ public static class Mapping
     {
         return new()
         {
+            Id = order.Id,
             OfferID = order.OfferID,
             Offer = order.Offer.ToDTO(),
             OrderStatus = order.OrderStatus,
