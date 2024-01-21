@@ -1,7 +1,9 @@
-﻿using CourierAppBackend.Abstractions.Repositories;
+
+using CourierAppBackend.Abstractions.Repositories;
 using CourierAppBackend.Abstractions.Services;
 using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourierAppBackend.Controllers;
@@ -9,11 +11,11 @@ namespace CourierAppBackend.Controllers;
 [Route("api/orders")]
 [ApiController]
 [ApiExplorerSettings(GroupName = "private")]
-public class OrdersController(IOrdersRepository ordersRepository, IMessageSender messageSender)
+public class OrdersController(IOrdersRepository ordersRepository, IMessageSender messageSender, IFileService fileService)
     : ControllerBase
 {
-    // GET: api/orders
-    [ProducesResponseType(typeof(OrderDTO), StatusCodes.Status200OK)]
+// GET: api/orders
+   [ProducesResponseType(typeof(OrderDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpGet]
@@ -48,5 +50,18 @@ public class OrdersController(IOrdersRepository ordersRepository, IMessageSender
     public async Task<IActionResult> test()
     {
         return Ok();
+    }
+
+        
+        // just to test upload functionality
+        [HttpPost("upload")]
+        public async Task<IActionResult> upload(IFormFile file)
+        {
+            String s = await _fileService.SaveFile(file);
+            if (s == "")
+                return BadRequest();
+            return Ok(s);
+        } 
+
     }
 }
