@@ -131,9 +131,9 @@ public static class Mapping
         {
             Dimensions = new()
             {
-                Width = inquiry.Package.Width,
-                Height = inquiry.Package.Height,
-                Length = inquiry.Package.Length,
+                Width = inquiry.Package.Width / 100f,
+                Height = inquiry.Package.Height / 100f,
+                Length = inquiry.Package.Length / 100f,
             },
             Weight = inquiry.Package.Weight,
             Source = new()
