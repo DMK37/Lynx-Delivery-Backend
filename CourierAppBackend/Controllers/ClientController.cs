@@ -16,7 +16,7 @@ public class ClientController(IInquiriesRepository inquiriesRepository, IUserRep
     [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [HttpPost("user-info")]
-    //[Authorize("edit:profile")]
+    [Authorize("edit:profile")]
     public async Task<ActionResult<UserDTO>> EditUser([FromBody] UserDTO userDTO)
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
@@ -29,8 +29,8 @@ public class ClientController(IInquiriesRepository inquiriesRepository, IUserRep
     [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    [HttpGet("user-info")]
-    //[Authorize("get:profile")]
+    [HttpGet("user-info")] 
+    [Authorize("get:profile")]
     public async Task<ActionResult<UserDTO>> GetUserInfo()
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
@@ -43,7 +43,7 @@ public class ClientController(IInquiriesRepository inquiriesRepository, IUserRep
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpGet("inquiries")]
-    //[Authorize("get:last-inquiries")]
+    [Authorize("get:last-inquiries")]
     public async Task<ActionResult<List<InquiryDTO>>> GetLastInquiries()
     {
         string userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
@@ -56,6 +56,7 @@ public class ClientController(IInquiriesRepository inquiriesRepository, IUserRep
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpGet("orders")]
+    [Authorize("get:user-orders")]
     public async Task<ActionResult<List<OrderDTO>>> GetOrders()
     {
         string userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;

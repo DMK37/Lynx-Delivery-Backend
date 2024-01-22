@@ -40,7 +40,7 @@ public class OffersController(IOffersRepository offersRepository, IOrdersReposit
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpGet]
-    //[Authorize("read:all-offers")]
+    [Authorize("read:all-offers")]
     public async Task<ActionResult<List<Offer>>> GetOffers()
     {
         var offers = await offersRepository.GetAll();
@@ -52,7 +52,7 @@ public class OffersController(IOffersRepository offersRepository, IOrdersReposit
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(List<OfferDTO>), StatusCodes.Status404NotFound)]
     [HttpGet("pending")]
-    //[Authorize("read:all-offers")]
+    [Authorize("read:all-pending-offers")]
     public async Task<ActionResult<List<OfferDTO>>> GetPendingOffers()
     {
         var offers = await offersRepository.GetPending();
@@ -64,6 +64,7 @@ public class OffersController(IOffersRepository offersRepository, IOrdersReposit
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpPost("{id}/accept")]
+    [Authorize("read:all-pending-offers")]
     public async Task<IActionResult> AcceptOffer([FromRoute] int id, IFormFile agreement, IFormFile receipt)
     {
         String s = await fileService.SaveFile(agreement);
@@ -86,6 +87,7 @@ public class OffersController(IOffersRepository offersRepository, IOrdersReposit
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpPost("{id}/reject")]
+    [Authorize("read:all-pending-offers")]
     public async Task<IActionResult> RejectOffer([FromRoute] int id, [FromBody] string reason)
     {
         var offers = await offersRepository.RejectOffer(id, reason);

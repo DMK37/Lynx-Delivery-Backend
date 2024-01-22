@@ -3,7 +3,7 @@ using CourierAppBackend.Abstractions.Repositories;
 using CourierAppBackend.Abstractions.Services;
 using CourierAppBackend.Models.Database;
 using CourierAppBackend.Models.DTO;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourierAppBackend.Controllers;
@@ -19,6 +19,7 @@ public class OrdersController(IOrdersRepository ordersRepository)
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpGet]
+    [Authorize("edit:order")]
     public async Task<ActionResult<List<OrderDTO>>> GetAll()
     {
         var orders = await ordersRepository.GetAll();
@@ -40,6 +41,7 @@ public class OrdersController(IOrdersRepository ordersRepository)
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [HttpPatch("{id}")]
+    [Authorize("edit:order")]
     public async Task<ActionResult<Order>> UpdateOrder([FromRoute] int id, [FromBody] OrderUpdate orderUpdate)
     {
         var order = await ordersRepository.UpdateOrder(id, orderUpdate);

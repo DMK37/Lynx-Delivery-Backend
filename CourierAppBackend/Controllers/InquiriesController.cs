@@ -19,6 +19,7 @@ public class InquiriesController(IInquiriesRepository repository, IOffersReposit
     [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [HttpPost("{id}/add")]
+    [Authorize("get:last-inquiries")]
     public async Task<ActionResult<InquiryDTO>> AddInquiry([FromRoute] int id)
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value!;
@@ -51,7 +52,7 @@ public class InquiriesController(IInquiriesRepository repository, IOffersReposit
     [ProducesResponseType(typeof(List<InquiryDTO>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    //[Authorize("read:all-inquiries")]
+    [Authorize("read:all-inquiries")]
     [HttpGet]
     public async Task<ActionResult<List<InquiryDTO>>> GetAll()
     {
